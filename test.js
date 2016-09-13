@@ -53,6 +53,12 @@ describe('Transposer', function() {
     expect(Transposer.transpose(text).toKey('C').text).to.equal(text);
   });
 
+  it ("Auto key signature works for minor chords", function() {
+      var text = "Cm D Eb Fm G Ab Bb Cm";
+      // Should not be Db major.
+      expect(Transposer.transpose(text).up(1).text).to.equal('C#m D# E F#m G# A B C#m');
+  });
+
   it ("The reported change in semitones are correct", function() {
     var text = cmajor;
     for (var i = 0; i < 12; i++) {
