@@ -1,7 +1,7 @@
 {
   "name": "chord-transposer",
   "version": "1.0.0",
-  "description": "Library for transposing chords, including chords embedded in lyrics or other text.",
+  "description": "Chord/music transposition, including chords embedded in lyrics or other text.",
   "main": "index.js",
   "dependencies": {
     "trim": "^0.0.1",

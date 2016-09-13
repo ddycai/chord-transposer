@@ -1,13 +1,16 @@
 Chord Transposer
 ========
 
-A Javascript library for transposing musical chords from one key to another,
-including chords embedded in text such those found in lyrics/tabs.  Only chords
-will be identified and transposed and whitespace is preserved.
+A Javascript library for transposing musical chords, including chords embedded
+in text such those found in lyrics/tabs. The transposer distinguishes between
+chords and regular text, only tranposing chords and preserving whitespace.
 
 The library is unit tested, and tests can be found in `test.js`.
 
 ## Usage
+
+
+### Transposing to a Specific Key
 
 Given some text containing chords, you can transpose it to any other key using
 `toKey`. The key signature taken by the transposer is always the major form. So
@@ -24,6 +27,8 @@ newKey = result.key;
 semitonesBetween = result.change;
 ```
 
+### Transposing Up or Down Semitones
+
 You can also transpose up or down any number of semitones.
 
 ```javascript
@@ -33,6 +38,8 @@ result = Transposer.transpose(text).fromKey('C').up(7);
 // Transpose down 4 semitones from C major.
 result = Transposer.transpose(text).fromKey('C').down(4);
 ```
+
+### Auto Key Signature
 
 You can choose not to specify the current key. Transposer will choose the first
 chord of your text to be the key signature.
@@ -44,6 +51,8 @@ result = Transposer.transpose(text).toKey('C');
 // Transpose down 4 semitones.
 result = Transposer.transpose(text).down(4);
 ```
+
+### Formatter
 
 You can pass in a formatter to format the chord symbols. A formatter takes the
 chord symbol and an ID and returns the formatted chord. For each unique chord, a
