@@ -53,14 +53,10 @@ describe('Transposer', function() {
     expect(Transposer.transpose(text).toKey('C').text).to.equal(text);
   });
 
-  it ("The reported change in semitones are correct", function() {
-    var text = cmajor;
-    for (var i = 0; i < 12; i++) {
-      expect(Transposer.transpose(text).up(i).change).to.equal(i);
-    }
-    for (var i = 0; i < 12; i++) {
-      expect(Transposer.transpose(text).toKey(keys[i]).change).to.equal(i);
-    }
+  it ("Auto key signature works for minor chords", function() {
+      var text = "Cm D Eb Fm G Ab Bb Cm";
+      // Should not be Db major.
+      expect(Transposer.transpose(text).up(1).text).to.equal('C#m D# E F#m G# A B C#m');
   });
 
   it ("The resulting keys are correct", function() {
@@ -72,14 +68,6 @@ describe('Transposer', function() {
       expect(Transposer.transpose(text).toKey(keys[i]).key).to.equal(keys[i]);
     }
   });
-
-  it ("Transposing up an octave is correct", function() {
-      expect(Transposer.transpose(cmajor).up(12).change).to.equal(0);
-      var result = Transposer.transpose(cmajor).toKey('C');
-      expect(result.change).to.equal(0);
-      expect(result.key).to.equal('C');
-  });
-
 
   it ("The correct chords are returned if a key signature is given", function() {
     var text = 'C D E F G A B C';
@@ -115,16 +103,23 @@ describe('Transposer', function() {
   });
 
   it ("Transposes various types of chords", function() {
-    expect(Transposer.transpose('Asus4').up(2).text).to.equal('Bsus4');
-    expect(Transposer.transpose('A7').up(2).text).to.equal('B7');
-    expect(Transposer.transpose('Adim').up(2).text).to.equal('Bdim');
-    expect(Transposer.transpose('Am').up(2).text).to.equal('Bm');
-    expect(Transposer.transpose('Amaj').up(2).text).to.equal('Bmaj');
+    expect(Transposer.transpose('C Cmaj CM').toKey('F').text)
+        .to.equal('F Fmaj FM');
+    expect(Transposer.transpose('Cm Cmin C-').toKey('F').text)
+        .to.equal('Dm Dmin D-');
+    expect(Transposer.transpose('Cdim').toKey('F').text)
+        .to.equal('Fdim');
+    expect(Transposer.transpose('Caug C+ C+5').toKey('F').text)
+        .to.equal('Faug F+ F+5');
+    expect(Transposer.transpose('Asus4 Asus6').up(2).text)
+        .to.equal('Bsus4 Bsus6');
   });
 
   it ("Transposes bass chords to the right key", function() {
     expect(Transposer.transpose('A/D').up(2).text).to.equal('B/E');
     expect(Transposer.transpose('G/F').up(1).text).to.equal('Ab/Gb');
+    expect(Transposer.transpose('C/F C7/F Cm/F').toKey('Db').text)
+        .to.equal('Db/Gb Db7/Gb Dbm/Gb');
   });
 
   it ("Invalid chords are not transposed", function() {

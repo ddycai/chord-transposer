@@ -4,7 +4,7 @@ var trim = require('trim');
 module.exports = {
   transpose: function(text) {
     return new Text(text);
-  }
+  },
 }
 
 /**
@@ -110,7 +110,7 @@ function transpose(text, mapper, currentKey, formatter) {
 
       // If symbol is chord, transpose it.
       if (chordPattern.test(tokens[i])) {
-        parts = XRegExp.exec(tokens[i], chordPattern);
+        parts = parse(tokens[i]);
         // If current key is unknown, set the first seen chord to the current key.
         if (!currentKey) {
           // If the first chord is minor, find its major equivalent.
@@ -145,8 +145,11 @@ function transpose(text, mapper, currentKey, formatter) {
   return {
     text: newText.join('\n'),
     key: newKey,
-    change: semitonesBetween(currentKey, newKey)
   };
+}
+
+function parse(sym) {
+  return XRegExp.exec(sym, chordPattern);
 }
 
 /**
