@@ -1,0 +1,34 @@
+{
+  "name": "chord-transposer",
+  "version": "1.0.0",
+  "description": "Library for transposing chords, including chords embedded in lyrics or other text.",
+  "main": "index.js",
+  "dependencies": {
+    "trim": "^0.0.1",
+    "xregexp": "^3.1.1"
+  },
+  "devDependencies": { 
+    "chai": "^3.5.0"
+  },
+  "scripts": {
+    "test": "mocha test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/frigidrain/chord-transposer.git"
+  },
+  "keywords": [
+    "transpose",
+    "chord",
+    "music",
+    "pitch",
+    "note",
+    "lyrics"
+  ],
+  "author": "frigidrain",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/frigidrain/chord-transposer/issues"
+  },
+  "homepage": "https://github.com/frigidrain/chord-transposer#readme"
+}
