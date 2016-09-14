@@ -21,7 +21,6 @@ npm install chord-transposer
 var Transposer = require('chord-transposer');
 ```
 
-
 ### Transposing to a Specific Key
 
 Given some text containing chords, you can transpose it to any other key using
