@@ -23,7 +23,8 @@
     "music",
     "pitch",
     "note",
-    "lyrics"
+    "lyrics",
+    "tabs"
   ],
   "author": "frigidrain",
   "license": "ISC",

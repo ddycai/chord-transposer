@@ -27,7 +27,7 @@ Given some text containing chords, you can transpose it to any other key using
 `toKey`. The key signature taken by the transposer is always the major form so
 Am should be given as C.
 
-```
+```javascript
 // Transpose from F major to D major.
 Transposer.transpose('F  C7 Bb   \nHello world').fromKey('F').toKey('D');
 // { text: 'D  A7 G   \nHello world', key: 'D' }
