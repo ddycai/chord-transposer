@@ -1,13 +1,13 @@
 {
   "name": "chord-transposer",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Chord/music transposition, including chords embedded in lyrics or other text.",
   "main": "index.js",
   "dependencies": {
     "trim": "^0.0.1",
     "xregexp": "^3.1.1"
   },
-  "devDependencies": { 
+  "devDependencies": {
     "chai": "^3.5.0"
   },
   "scripts": {
