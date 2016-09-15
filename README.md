@@ -56,7 +56,7 @@ chord of your text to be the key signature.
 Transposer.transpose('F  C7 Bb   \nHello world').toKey('D');
 // { text: 'D  A7 G   \nHello world', key: 'D' }
 
-Transposer.transpose('F  Am Bb   \nHello world').fromKey('F').up(7);
+Transposer.transpose('F  Am Bb   \nHello world').up(7);
 // { text: 'C  Em F   \nHello world', key: 'C' }
 ```
 
@@ -94,10 +94,13 @@ colour, for example.
 To surround chords with a `<span>`:
 
 ```javascript
-// Transpose and put each chord in a span
-result = Transposer.transpose(text).withFormatter(
+// Transpose and put each chord in a span.
+Transposer.transpose('F  C7 Bb   \nHello world').withFormatter(
       function(sym, id) {
         return '<span>' + sym + '</span>';
-      }
-    ).toKey('Bb');
+      }).toKey('Bb');
+
+// output
+{ text: '<span>Bb</span>  <span>F7</span> <span>Eb</span>   \nHello world',
+	key: 'Bb' }
 ```
