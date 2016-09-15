@@ -1,5 +1,4 @@
 var XRegExp = require('xregexp');
-var trim = require('trim');
 
 module.exports = {
   transpose: function(text) {
@@ -97,7 +96,7 @@ function transpose(text, mapper, currentKey, formatter) {
 
     for (var i = 0; i < tokens.length; i++) {
       // Check for all whitespace.
-      if (trim(tokens[i]) === '') {
+      if (tokens[i].trim() === '') {
         newLine += tokens[i];
         continue;
       }

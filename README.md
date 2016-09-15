@@ -29,8 +29,9 @@ Am should be given as C.
 
 ```javascript
 // Transpose from F major to D major.
-Transposer.transpose('F  C7 Bb   \nHello world').fromKey('F').toKey('D');
-// { text: 'D  A7 G   \nHello world', key: 'D' }
+> Transposer.transpose('F  C7 Bb   \nHello world').fromKey('F').toKey('D');
+// output:
+{ text: 'D  A7 G   \nHello world', key: 'D' }
 ```
 
 ### Transposing Up or Down Semitones
@@ -39,12 +40,12 @@ You can also transpose up or down any number of semitones.
 
 ```javascript
 // Transpose up 7 semitones from F major.
-Transposer.transpose('F  Am Bb   \nHello world').fromKey('F').up(7);
-// { text: 'C  Em F   \nHello world', key: 'C' }
+> Transposer.transpose('F  Am Bb   \nHello world').fromKey('F').up(7);
+{ text: 'C  Em F   \nHello world', key: 'C' }
 
 // Transpose down 4 semitones from F major.
-Transposer.transpose('F  Am Bb   \nHello world').fromKey('F').down(4);
-// { text: 'Db  Fm Gb   \nHello world', key: 'Db' }
+> Transposer.transpose('F  Am Bb   \nHello world').fromKey('F').down(4);
+{ text: 'Db  Fm Gb   \nHello world', key: 'Db' }
 ```
 
 ### Auto Key Signature
@@ -53,11 +54,11 @@ You can choose not to specify the current key. Transposer will choose the first
 chord of your text to be the key signature.
 
 ```javascript
-Transposer.transpose('F  C7 Bb   \nHello world').toKey('D');
-// { text: 'D  A7 G   \nHello world', key: 'D' }
+> Transposer.transpose('F  C7 Bb   \nHello world').toKey('D');
+{ text: 'D  A7 G   \nHello world', key: 'D' }
 
-Transposer.transpose('F  Am Bb   \nHello world').up(7);
-// { text: 'C  Em F   \nHello world', key: 'C' }
+> Transposer.transpose('F  Am Bb   \nHello world').up(7);
+{ text: 'C  Em F   \nHello world', key: 'C' }
 ```
 
 ### Supported Chords
@@ -65,20 +66,20 @@ Transposer.transpose('F  Am Bb   \nHello world').up(7);
 Various types of chords are supported:
 
 ```java
-Transposer.transpose('C Cmaj CM').toKey('F');
-// { text: 'F Fmaj FM', key: 'F' }
+> Transposer.transpose('C Cmaj CM').toKey('F');
+{ text: 'F Fmaj FM', key: 'F' }
 
-Transposer.transpose('Cm Cmin C-').toKey('F');
-// { text: 'Dm Dmin D-', key: 'F' }
+> Transposer.transpose('Cm Cmin C-').toKey('F');
+{ text: 'Dm Dmin D-', key: 'F' }
 
-Transposer.transpose('Cdim').toKey('F');
-// { text: 'Fdim', key: 'F' }
+> Transposer.transpose('Cdim').toKey('F');
+{ text: 'Fdim', key: 'F' }
 
-Transposer.transpose('Caug C+ C+5').toKey('F');
-// { text: 'Faug F+ F+5', key: 'F' }
+> Transposer.transpose('Caug C+ C+5').toKey('F');
+{ text: 'Faug F+ F+5', key: 'F' }
 
-Transposer.transpose('C/F C7/F Cm/F').toKey('F');
-// { text: 'F/Bb F7/Bb Fm/Bb', key: 'F' }
+> Transposer.transpose('C/F C7/F Cm/F').toKey('F');
+{ text: 'F/Bb F7/Bb Fm/Bb', key: 'F' }
 ```
 
 ### Formatter
@@ -95,12 +96,10 @@ To surround chords with a `<span>`:
 
 ```javascript
 // Transpose and put each chord in a span.
-Transposer.transpose('F  C7 Bb   \nHello world').withFormatter(
+> Transposer.transpose('F  C7 Bb   \nHello world').withFormatter(
       function(sym, id) {
         return '<span>' + sym + '</span>';
       }).toKey('Bb');
-
-// output
 { text: '<span>Bb</span>  <span>F7</span> <span>Eb</span>   \nHello world',
 	key: 'Bb' }
 ```
