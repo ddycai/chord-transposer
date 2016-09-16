@@ -4,6 +4,8 @@ module.exports = {
   transpose: function(text) {
     return new Text(text);
   },
+  // Visible for testing
+  InvalidKeySignatureException: InvalidKeySignatureException,
 }
 
 /**
@@ -16,7 +18,7 @@ function Text(text) {
   var formatter = null;
 
   this.fromKey = function(key) {
-    currentKey = key;
+    currentKey = getMajorKey(key);
     return this;
   }
 
@@ -34,10 +36,36 @@ function Text(text) {
   }
 
   this.toKey = function(key) {
+    key = getMajorKey(key);
     return transpose(text, 
         function(currentKey) { return key; },
         currentKey,
         formatter);
+  }
+}
+
+/**
+ * Thrown when a key signature is invalid.
+ */
+function InvalidKeySignatureException(key) {
+    this.name = 'InvalidKeySignatureException';
+    this.message = key + ' is not a valid key signature.';
+    this.stack = (new Error()).stack;
+}
+
+/**
+ * Given a chord, transform it into a minor key.
+ * Throws Error if the chord is not a valid key signature.
+ */
+function getMajorKey(chord) {
+  if (!chordRegex.test(chord)) {
+    throw new InvalidKeySignatureException(chord);
+  }
+  var parts = parse(chord);
+  if (minorChordRegex.test(chord)) {
+    return minors[parts.chord];
+  } else {
+    return parts.chord;
   }
 }
 
@@ -108,16 +136,11 @@ function transpose(text, mapper, currentKey, formatter) {
       }
 
       // If symbol is chord, transpose it.
-      if (chordPattern.test(tokens[i])) {
+      if (chordRegex.test(tokens[i])) {
         parts = parse(tokens[i]);
         // If current key is unknown, set the first seen chord to the current key.
         if (!currentKey) {
-          // If the first chord is minor, find its major equivalent.
-          if (parts.suffix == 'm' || parts.suffix == 'min') {
-            currentKey = minors[parts.chord];
-          } else {
-            currentKey = parts.chord;
-          }
+          currentKey = getMajorKey(tokens[i]);
           newKey = mapper(currentKey);
           map = transpositionMap(currentKey, newKey);
         }
@@ -148,7 +171,7 @@ function transpose(text, mapper, currentKey, formatter) {
 }
 
 function parse(sym) {
-  return XRegExp.exec(sym, chordPattern);
+  return XRegExp.exec(sym, chordRegex);
 }
 
 /**
@@ -195,10 +218,10 @@ function transpositionMap(currentKey, newKey) {
 
 function semitonesBetween(a, b) {
   if (!(a in keys)) {
-    throw new Error(a + " is not a valid key signature.");
+    throw new InvalidKeySignatureException(a);
   }
   if (!(b in keys)) {
-    throw new Error(b + " is not a valid key signature.");
+    throw new InvalidKeySignatureException(b);
   }
   return keys[b]["index"] - keys[a]["index"];
 }
@@ -208,7 +231,7 @@ function semitonesBetween(a, b) {
  */
 function transposeKey(currentKey, semitones) {
   if (!(currentKey in keys)) {
-    throw new Error(currentKey + " is not a valid key signature.");
+    throw new InvalidKeySignatureException(currentKey);
   }
   var newInd = (keys[currentKey]["index"] + semitones + N_KEYS) % N_KEYS;
   for (var k in keys) {
@@ -296,14 +319,14 @@ var keys = {
 // Maps each minor key to its major equivalent.
 var minors = {
   "C": "Eb",
-  "Db": "F",
+  "C#": "E",
   "D": "F",
   "Eb": "Gb",
   "E": "G",
   "F": "Ab",
   "F#": "A",
   "G": "Bb",
-  "Ab": "Cb",
+  "G#": "B",
   "A": "C",
   "Bb": "Db",
   "B": "D"
@@ -312,4 +335,10 @@ var minors = {
 var N_KEYS = 12;
 
 // Regex for recognizing chords
-var chordPattern = XRegExp('^(?<chord>[A-G](#|b)?)(?<suffix>(\\(?(M|maj|major|m|min|minor|dim|sus|dom|aug|\\+|-|add)?\\d*\\)?)*)(\\/(?<bass>[A-G](#|b)?))?$');
+var rootPattern = '(?<chord>[A-G](#|b)?)';
+var suffixPattern = '(?<suffix>(\\(?(M|maj|major|m|min|minor|dim|sus|dom|aug|\\+|-|add)?\\d*\\)?)*)';
+var bassPattern = '(\\/(?<bass>[A-G](#|b)?))?';
+var minorPattern = '(m|min|minor)' + suffixPattern;
+
+var chordRegex = XRegExp('^' + rootPattern + suffixPattern + bassPattern + '$');
+var minorChordRegex = XRegExp('^' + rootPattern + minorPattern + bassPattern + '$');
