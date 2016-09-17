@@ -236,4 +236,9 @@ describe('Transposer', function() {
         })
       .toKey('Bb').text).to.equal('<b>Bb</b> C <b>Bb</b>');
   });
+
+  it ("Handles sequence of chords separated by dash", function() {
+    expect(Transposer.transpose("A-E-F#m-D").up(1).text)
+      .to.equal("Bb-F-Gm-Eb");
+  });
 });
