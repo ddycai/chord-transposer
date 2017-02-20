@@ -120,7 +120,7 @@ function transpose(text, mapper, currentKey, formatter) {
     var newLine = "",
       chordCount = 0,
       tokenCount = 0;
-    var tokens = lines[k].split(/(\s+|-)/g);
+    var tokens = lines[k].split(/(\s|-|]|\[)/g);
 
     for (var i = 0; i < tokens.length; i++) {
       // Check for all whitespace.
@@ -134,7 +134,6 @@ function transpose(text, mapper, currentKey, formatter) {
         chordCount++;
         continue;
       }
-
       // If symbol is chord, transpose it.
       if (chordRegex.test(tokens[i])) {
         parts = parse(tokens[i]);

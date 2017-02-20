@@ -241,4 +241,9 @@ describe('Transposer', function() {
     expect(Transposer.transpose("A-E-F#m-D").up(1).text)
       .to.equal("Bb-F-Gm-Eb");
   });
+
+    it ("Handles sequence of chords wrapped with square brackets", function() {
+        var text2 = "[C]Suddenly\n[D]You're [C]here";
+        expect(Transposer.transpose(text2).up(1).text).to.equal("[F]Suddenly\n[G]You're [F]here");
+    });
 });
