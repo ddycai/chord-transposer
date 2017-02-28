@@ -4,6 +4,8 @@ module.exports = {
   transpose: function(text) {
     return new Text(text);
   },
+  // Finds the number of semitones (half steps) between the given keys.
+  semitonesBetween: semitonesBetween,
   // Visible for testing
   InvalidKeySignatureException: InvalidKeySignatureException,
 }
