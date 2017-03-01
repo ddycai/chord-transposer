@@ -1,14 +1,125 @@
-var XRegExp = require('xregexp');
-
 module.exports = {
   transpose: function(text) {
     return new Text(text);
   },
-  // Finds the number of semitones (half steps) between the given keys.
-  semitonesBetween: semitonesBetween,
+
+  // A map from each key signature to an object with the following keys:
+  // index: offset in semitones of this key signature from C major
+  // sharps: the number of sharps in the key signature
+  // flats: the number of flats in the key signature
+  keySignatures: keys,
+
+  // Chromatic scale starting from C using sharps only.
+  sharpNotes: sharps,
+
+  // Chromatic scale starting from C using flats only.
+  flatNotes: flats,
+
+  // Maps each major key signature to its relative minor.
+  majorToMinorMap: minors,
+
   // Visible for testing
   InvalidKeySignatureException: InvalidKeySignatureException,
 }
+
+var XRegExp = require('xregexp');
+
+var N_KEYS = 12;
+
+// List of chords using flats.
+var flats = ["C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "Cb"];
+
+// List of chords using sharps.
+var sharps = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+
+// List of key signatures and some data about each.
+var keys = {
+  "C": {
+    index: 0,
+    sharps: 0,
+    flats: 0
+  },
+  "Db": {
+    index: 1,
+    sharps: 0,
+    flats: 5
+  },
+  "D": {
+    index: 2,
+    sharps: 2,
+    flats: 0
+  },
+  "Eb": {
+    index: 3,
+    sharps: 0,
+    flats: 3
+  },
+  "E": {
+    index: 4,
+    sharps: 4,
+    flats: 0
+  },
+  "F": {
+    index: 5,
+    sharps: 0,
+    flats: 1
+  },
+  "Gb": {
+    index: 6,
+    sharps: 0,
+    flats: 6
+  },
+  "G": {
+    index: 7,
+    sharps: 1,
+    flats: 0
+  },
+  "Ab": {
+    index: 8,
+    sharps: 0,
+    flats: 4
+  },
+  "A": {
+    index: 9,
+    sharps: 3,
+    flats: 0
+  },
+  "Bb": {
+    index: 10,
+    sharps: 0,
+    flats: 2
+  },
+  "B": {
+    index: 11,
+    sharps: 5,
+    flats: 0
+  }
+};
+
+// Maps each minor key to its major equivalent.
+var minors = {
+  "C": "Eb",
+  "C#": "E",
+  "D": "F",
+  "Eb": "Gb",
+  "E": "G",
+  "F": "Ab",
+  "F#": "A",
+  "G": "Bb",
+  "G#": "B",
+  "A": "C",
+  "Bb": "Db",
+  "B": "D"
+};
+
+// Regex for recognizing chords
+var rootPattern = '(?<chord>[A-G](#|b)?)';
+var suffixPattern = '(?<suffix>(\\(?(M|maj|major|m|min|minor|dim|sus|dom|aug|\\+|-|add)?\\d*\\)?)*)';
+var bassPattern = '(\\/(?<bass>[A-G](#|b)?))?';
+var minorPattern = '(m|min|minor)' + suffixPattern;
+
+var chordRegex = XRegExp('^' + rootPattern + suffixPattern + bassPattern + '$');
+var minorChordRegex = XRegExp('^' + rootPattern + minorPattern + bassPattern + '$');
 
 /**
  * Object which holds information about the text. The text is transposed and
@@ -169,6 +280,8 @@ function transpose(text, mapper, currentKey, formatter) {
   return {
     text: newText.join('\n'),
     key: newKey,
+    original_key: currentKey,
+    offset: (semitonesBetween(currentKey, newKey) + N_KEYS) % N_KEYS,
   };
 }
 
@@ -247,100 +360,3 @@ function transposeKey(currentKey, semitones) {
 function defaultFormatter(text, id) {
   return text;
 }
-
-// List of chords using flats.
-var flats = ["C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "Cb"];
-
-// List of chords using sharps.
-var sharps = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
-
-// List of key signatures and some data about each.
-var keys = {
-  "C": {
-    index: 0,
-    sharps: 0,
-    flats: 0
-  },
-  "Db": {
-    index: 1,
-    sharps: 0,
-    flats: 5
-  },
-  "D": {
-    index: 2,
-    sharps: 2,
-    flats: 0
-  },
-  "Eb": {
-    index: 3,
-    sharps: 0,
-    flats: 3
-  },
-  "E": {
-    index: 4,
-    sharps: 4,
-    flats: 0
-  },
-  "F": {
-    index: 5,
-    sharps: 0,
-    flats: 1
-  },
-  "Gb": {
-    index: 6,
-    sharps: 0,
-    flats: 6
-  },
-  "G": {
-    index: 7,
-    sharps: 1,
-    flats: 0
-  },
-  "Ab": {
-    index: 8,
-    sharps: 0,
-    flats: 4
-  },
-  "A": {
-    index: 9,
-    sharps: 3,
-    flats: 0
-  },
-  "Bb": {
-    index: 10,
-    sharps: 0,
-    flats: 2
-  },
-  "B": {
-    index: 11,
-    sharps: 5,
-    flats: 0
-  }
-};
-
-// Maps each minor key to its major equivalent.
-var minors = {
-  "C": "Eb",
-  "C#": "E",
-  "D": "F",
-  "Eb": "Gb",
-  "E": "G",
-  "F": "Ab",
-  "F#": "A",
-  "G": "Bb",
-  "G#": "B",
-  "A": "C",
-  "Bb": "Db",
-  "B": "D"
-};
-
-var N_KEYS = 12;
-
-// Regex for recognizing chords
-var rootPattern = '(?<chord>[A-G](#|b)?)';
-var suffixPattern = '(?<suffix>(\\(?(M|maj|major|m|min|minor|dim|sus|dom|aug|\\+|-|add)?\\d*\\)?)*)';
-var bassPattern = '(\\/(?<bass>[A-G](#|b)?))?';
-var minorPattern = '(m|min|minor)' + suffixPattern;
-
-var chordRegex = XRegExp('^' + rootPattern + suffixPattern + bassPattern + '$');
-var minorChordRegex = XRegExp('^' + rootPattern + minorPattern + bassPattern + '$');

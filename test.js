@@ -147,9 +147,13 @@ describe('Transposer', function() {
     }
   });
 
-  it ("The correct chords are returned if a key signature is given", function() {
+  it ("The correct chords are returned if no key signature is given", function() {
     var text = 'C D E F G A B C';
-    expect(Transposer.transpose(text).toKey('Db').text).to.equal('Db Eb F Gb Ab Bb C Db');
+    var result = Transposer.transpose(text).toKey('Db');
+    expect(result.text).to.equal('Db Eb F Gb Ab Bb C Db');
+    expect(result.key).to.equal('Db');
+    expect(result.original_key).to.equal('C');
+    expect(result.offset).to.equal(1);
   });
 
   it ("An error should be thrown for invalid key signature", function() {
@@ -211,8 +215,17 @@ describe('Transposer', function() {
   });
 
   it ("Behaviour is as expected if a wrong key signature is given", function() {
-    expect(Transposer.transpose('A B C').fromKey('D').toKey('E').text).to.equal('B C# D');
-    expect(Transposer.transpose('A B C').fromKey('B').toKey('Db').text).to.equal('Cb Db D');
+    var result = Transposer.transpose('A B C').fromKey('D').toKey('E');
+    expect(result.text).to.equal('B C# D');
+    expect(result.key).to.equal('E');
+    expect(result.original_key).to.equal('D');
+    expect(result.offset).to.equal(2);
+
+    result = Transposer.transpose('A B C').fromKey('B').toKey('Db');
+    expect(result.text).to.equal('Cb Db D');
+    expect(result.key).to.equal('Db');
+    expect(result.original_key).to.equal('B');
+    expect(result.offset).to.equal(2);
   });
 
   it ("Test simple formatter", function() {
