@@ -7,20 +7,22 @@ module.exports = {
   // index: offset in semitones of this key signature from C major
   // sharps: the number of sharps in the key signature
   // flats: the number of flats in the key signature
-  keySignatures: keys,
+  keySignatures: () => keys,
 
   // Chromatic scale starting from C using sharps only.
-  sharpNotes: sharps,
+  sharpNotes: () => sharps,
 
   // Chromatic scale starting from C using flats only.
-  flatNotes: flats,
+  flatNotes: () => flats,
 
   // Maps each major key signature to its relative minor.
-  majorToMinorMap: minors,
+  majorToMinorMap: () => minors,
 
   // Visible for testing
   InvalidKeySignatureException: InvalidKeySignatureException,
 }
+
+var blah = "hello";
 
 var XRegExp = require('xregexp');
 
