@@ -47,19 +47,16 @@ Given some text containing chords, you can transpose it to any other key using
 The offset is always given as a positive number.
 
 **Note** The key returned by the Transposer is always the relative major.
-Therefore, you will get `F` even if you are transposing to `Dm`. If you need the
-minor key, you can do this with the transposer in the following way:
+Therefore, you will get `F` even if you are transposing to `Dm`. You can get the
+relative minor using this helper function:
 
 ```javascript
-// Get the relative minor of the given key.
-function getMinor(key) {
-  return Transposer.transpose(key).down(3).text + 'm';
-}
-
 // Get the relative minor of F major.
-> getMinor('F')
+> Transposer.getRelativeMinor('F') + 'm'
 'Dm'
 ```
+
+`Transposer.getRelativeMajor` also exists to do the reverse.
 
 ### Transposing Up or Down Semitones
 

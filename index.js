@@ -15,8 +15,11 @@ module.exports = {
   // Chromatic scale starting from C using flats only.
   flatScale: function() { return flats },
 
-  // Maps each major key signature to its relative minor.
-  minorToMajorMap: function() { return minors },
+  // Gets the relative minor of the given major key.
+  getRelativeMinor: getRelativeMinor,
+
+  // Gets the relative major of the given minor key.
+  getRelativeMajor: getRelativeMajor,
 
   // Visible for testing
   InvalidKeySignatureException: InvalidKeySignatureException,
@@ -37,7 +40,7 @@ var keys = {
   "C": {
     index: 0,
     sharps: 0,
-    flats: 0
+    flats: 0,
   },
   "Db": {
     index: 1,
@@ -121,6 +124,25 @@ var minorPattern = '(m|min|minor)' + suffixPattern;
 var chordRegex = XRegExp('^' + rootPattern + suffixPattern + bassPattern + '$');
 var minorChordRegex = XRegExp('^' + rootPattern + minorPattern + bassPattern + '$');
 
+/** Gets the relative minor of the given major key. */
+function getRelativeMinor(key) { 
+  checkValid(key);
+  if (keys[key].sharps > 0) {
+    return sharps[(keys[key].index + 9) % 12];
+  } else {
+    return flats[(keys[key].index + 9) % 12];
+  }
+}
+
+/** Gets the relative major of the given minor key without the 'm' suffix. */
+function getRelativeMajor(key) {
+  if (!(key in minors)) {
+      throw new InvalidKeySignatureException(key);
+  }
+  return minors[key];
+}
+
+
 /**
  * Object which holds information about the text. The text is transposed and
  * returned when up, down or toKey is called.
@@ -176,7 +198,7 @@ function getMajorKey(chord) {
   }
   var parts = parse(chord);
   if (minorChordRegex.test(chord)) {
-    return minors[parts.chord];
+    return getRelativeMajor[parts.chord];
   } else {
     return parts.chord;
   }
@@ -332,13 +354,15 @@ function transpositionMap(currentKey, newKey) {
 }
 
 function semitonesBetween(a, b) {
-  if (!(a in keys)) {
-    throw new InvalidKeySignatureException(a);
-  }
-  if (!(b in keys)) {
-    throw new InvalidKeySignatureException(b);
-  }
+  checkValid(a);
+  checkValid(b);
   return keys[b]["index"] - keys[a]["index"];
+}
+
+function checkValid(majorKey) {
+  if (!(majorKey in keys)) {
+    throw new InvalidKeySignatureException(majorKey);
+  }
 }
 
 /**
