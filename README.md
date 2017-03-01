@@ -41,6 +41,7 @@ Given some text containing chords, you can transpose it to any other key using
   key: 'F',
   original_key: 'Ab',
   offset: 9 }
+```
 
 `offset` is the number of semitones between the original key and your new key.
 The offset is always given as a positive number.
@@ -77,7 +78,8 @@ You can also transpose up or down any number of semitones.
 { text: 'Db  Fm Gb   \nHello world',
   key: 'Db',
   original_key: 'F',
-  offset: 8 }```
+  offset: 8 }
+```
 
 ### Auto Key Signature
 
@@ -125,7 +127,8 @@ Various types of chords are supported:
 { text: 'F/Bb F7/Bb Fm/Bb',
   key: 'F',
   original_key: 'C',
-  offset: 5 }```
+  offset: 5 }
+```
 
 ### Formatter
 
@@ -145,6 +148,7 @@ To surround chords with a `<span>`:
       function(sym, id) {
         return '<span>' + sym + '</span>';
       }).toKey('Bb')
+// output
 { text: '<span>Bb</span>  <span>F7</span> <span>Eb</span>   \nHello world',
   key: 'Bb',
   original_key: 'F',
