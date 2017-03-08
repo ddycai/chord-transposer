@@ -138,11 +138,12 @@ describe('Transposer', function() {
   });
 
   it ("The resulting keys are correct", function() {
+    var i;
     var text = cmajor;
-    for (var i = 0; i < 12; i++) {
+    for (i = 0; i < 12; i++) {
       expect(Transposer.transpose(text).up(i).key).to.equal(keys[i]);
     }
-    for (var i = 0; i < 12; i++) {
+    for (i = 0; i < 12; i++) {
       expect(Transposer.transpose(text).toKey(keys[i]).key).to.equal(keys[i]);
     }
   });
@@ -159,9 +160,9 @@ describe('Transposer', function() {
   it ("An error should be thrown for invalid key signature", function() {
     var text = 'C D E F G A B C';
 
-    expect(function() { Transposer.transpose(text).toKey('D#').text })
+    expect(function() { return Transposer.transpose(text).toKey('D#').text; })
       .to.throw(new Transposer.InvalidKeySignatureException('D#'));
-    expect(function() { Transposer.transpose(text).toKey('blah').text })
+    expect(function() { return Transposer.transpose(text).toKey('blah').text; })
       .to.throw(new Transposer.InvalidKeySignatureException('blah'));
   });
 
@@ -210,7 +211,7 @@ describe('Transposer', function() {
   });
 
   it ("Throw an error if no default chord and no chords were given", function() {
-    expect(function() { Transposer.transpose('I J K').toKey('C').text })
+    expect(function() { return Transposer.transpose('I J K').toKey('C').text; })
       .to.throw('No valid chords were found for default key signature.');
   });
 
@@ -241,7 +242,7 @@ describe('Transposer', function() {
     // Only bold the first chord.
     expect(Transposer.transpose('A B A').withFormatter(
         function(sym, id) {
-          if (id == 0) {
+          if (id === 0) {
             return '<b>' + sym + '</b>';
           } else {
             return sym;
@@ -253,5 +254,35 @@ describe('Transposer', function() {
   it ("Handles sequence of chords separated by dash", function() {
     expect(Transposer.transpose("A-E-F#m-D").up(1).text)
       .to.equal("Bb-F-Gm-Eb");
+  });
+
+  it ("getRelativeMajor", function() {
+    expect(Transposer.getRelativeMajor('Cm')).to.equal('Eb');
+    expect(Transposer.getRelativeMajor('C#m')).to.equal('E');
+    expect(Transposer.getRelativeMajor('Dm')).to.equal('F');
+    expect(Transposer.getRelativeMajor('Ebm')).to.equal('Gb');
+    expect(Transposer.getRelativeMajor('Em')).to.equal('G');
+    expect(Transposer.getRelativeMajor('Fm')).to.equal('Ab');
+    expect(Transposer.getRelativeMajor('F#m')).to.equal('A');
+    expect(Transposer.getRelativeMajor('Gm')).to.equal('Bb');
+    expect(Transposer.getRelativeMajor('G#m')).to.equal('B');
+    expect(Transposer.getRelativeMajor('Am')).to.equal('C');
+    expect(Transposer.getRelativeMajor('Bbm')).to.equal('Db');
+    expect(Transposer.getRelativeMajor('Bm')).to.equal('D');
+  });
+
+  it ("getRelativeMinor", function() {
+    expect(Transposer.getRelativeMinor('C')).to.equal('A');
+    expect(Transposer.getRelativeMinor('Db')).to.equal('Bb');
+    expect(Transposer.getRelativeMinor('D')).to.equal('B');
+    expect(Transposer.getRelativeMinor('Eb')).to.equal('C');
+    expect(Transposer.getRelativeMinor('E')).to.equal('C#');
+    expect(Transposer.getRelativeMinor('F')).to.equal('D');
+    expect(Transposer.getRelativeMinor('Gb')).to.equal('Eb');
+    expect(Transposer.getRelativeMinor('G')).to.equal('E');
+    expect(Transposer.getRelativeMinor('Ab')).to.equal('F');
+    expect(Transposer.getRelativeMinor('A')).to.equal('F#');
+    expect(Transposer.getRelativeMinor('Bb')).to.equal('G');
+    expect(Transposer.getRelativeMinor('B')).to.equal('G#');
   });
 });

@@ -7,13 +7,13 @@ module.exports = {
   // index: offset in semitones of this key signature from C major
   // sharps: the number of sharps in the key signature
   // flats: the number of flats in the key signature
-  keySignatures: function() { return keys },
+  keySignatures: function() { return keys; },
 
   // Chromatic scale starting from C using sharps only.
-  sharpScale: function() { return sharps },
+  sharpScale: function() { return sharps; },
 
   // Chromatic scale starting from C using flats only.
-  flatScale: function() { return flats },
+  flatScale: function() { return flats; },
 
   // Gets the relative minor of the given major key.
   getRelativeMinor: getRelativeMinor,
@@ -23,7 +23,7 @@ module.exports = {
 
   // Visible for testing
   InvalidKeySignatureException: InvalidKeySignatureException,
-}
+};
 
 var XRegExp = require('xregexp');
 
@@ -100,7 +100,7 @@ var keys = {
 };
 
 // Maps each minor key to its major equivalent.
-var minors = {
+var minorToMajorMap = {
   "C": "Eb",
   "C#": "E",
   "D": "F",
@@ -134,12 +134,20 @@ function getRelativeMinor(key) {
   }
 }
 
-/** Gets the relative major of the given minor key without the 'm' suffix. */
-function getRelativeMajor(key) {
-  if (!(key in minors)) {
-      throw new InvalidKeySignatureException(key);
+/**
+ * Given a chord, transform it into a minor key.
+ * Throws Error if the chord is not a valid key signature.
+ */
+function getRelativeMajor(chord) {
+  if (!chordRegex.test(chord)) {
+    throw new InvalidKeySignatureException(chord);
   }
-  return minors[key];
+  var parts = parse(chord);
+  if (minorChordRegex.test(chord)) {
+    return minorToMajorMap[parts.chord];
+  } else {
+    return parts.chord;
+  }
 }
 
 
@@ -147,36 +155,36 @@ function getRelativeMajor(key) {
  * Object which holds information about the text. The text is transposed and
  * returned when up, down or toKey is called.
  */
-function Text(text) {
-  var text = text;
+function Text(input) {
+  var text = input;
   var currentKey = null;
   var formatter = null;
 
   this.fromKey = function(key) {
-    currentKey = getMajorKey(key);
+    currentKey = getRelativeMajor(key);
     return this;
-  }
+  };
 
   this.withFormatter = function(fmt) {
     formatter = fmt;
     return this;
-  }
+  };
 
   this.up = function(n) {
     return transpose(text, semitoneMapper(n), currentKey, formatter);
-  }
+  };
 
   this.down = function(n) {
     return transpose(text, semitoneMapper(-n), currentKey, formatter);
-  }
+  };
 
   this.toKey = function(key) {
-    key = getMajorKey(key);
+    key = getRelativeMajor(key);
     return transpose(text, 
         function(currentKey) { return key; },
         currentKey,
         formatter);
-  }
+  };
 }
 
 /**
@@ -186,22 +194,6 @@ function InvalidKeySignatureException(key) {
     this.name = 'InvalidKeySignatureException';
     this.message = key + ' is not a valid key signature.';
     this.stack = (new Error()).stack;
-}
-
-/**
- * Given a chord, transform it into a minor key.
- * Throws Error if the chord is not a valid key signature.
- */
-function getMajorKey(chord) {
-  if (!chordRegex.test(chord)) {
-    throw new InvalidKeySignatureException(chord);
-  }
-  var parts = parse(chord);
-  if (minorChordRegex.test(chord)) {
-    return getRelativeMajor[parts.chord];
-  } else {
-    return parts.chord;
-  }
 }
 
 /**
@@ -222,7 +214,7 @@ function semitoneMapper(semitones) {
  * the first chord we see as the key signature.
  */
 function transpose(text, mapper, currentKey, formatter) {
-  if (formatter == null) {
+  if (formatter === null) {
     formatter = defaultFormatter;
   }
 
@@ -275,7 +267,7 @@ function transpose(text, mapper, currentKey, formatter) {
         parts = parse(tokens[i]);
         // If current key is unknown, set the first seen chord to the current key.
         if (!currentKey) {
-          currentKey = getMajorKey(tokens[i]);
+          currentKey = getRelativeMajor(tokens[i]);
           newKey = mapper(currentKey);
           map = transpositionMap(currentKey, newKey);
         }
@@ -319,14 +311,14 @@ function transposeToken(map, parts) {
     var chord = map[parts.chord];
     var suffix = (parts.suffix === undefined) ? "" : parts.suffix;
     var bass = (parts.bass === undefined) ? "" : map[parts.bass];
+    if (bass) {
+      return chord + suffix + "/" + bass;
+    } else {
+      return chord + suffix;
+    }
   } catch (err) {
     alert(err);
     return "";
-  }
-  if (bass) {
-    return chord + suffix + "/" + bass;
-  } else {
-    return chord + suffix;
   }
 }
 
@@ -340,7 +332,7 @@ function transpositionMap(currentKey, newKey) {
   semitones = semitonesBetween(currentKey, newKey);
 
   // Find out whether new key is sharp of flat.
-  if (keys[newKey]["flats"] > 0) {
+  if (keys[newKey].flats > 0) {
     scale = flats;
   } else {
     scale = sharps;
@@ -356,7 +348,7 @@ function transpositionMap(currentKey, newKey) {
 function semitonesBetween(a, b) {
   checkValid(a);
   checkValid(b);
-  return keys[b]["index"] - keys[a]["index"];
+  return keys[b].index - keys[a].index;
 }
 
 function checkValid(majorKey) {
@@ -372,9 +364,9 @@ function transposeKey(currentKey, semitones) {
   if (!(currentKey in keys)) {
     throw new InvalidKeySignatureException(currentKey);
   }
-  var newInd = (keys[currentKey]["index"] + semitones + N_KEYS) % N_KEYS;
+  var newInd = (keys[currentKey].index + semitones + N_KEYS) % N_KEYS;
   for (var k in keys) {
-    if (keys[k]["index"] == newInd) {
+    if (keys[k].index == newInd) {
       return k;
     }
   }
