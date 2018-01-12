@@ -1,21 +1,30 @@
 {
   "name": "chord-transposer",
   "version": "1.4.0",
-  "description": "Chord/music transposition, including chords embedded in lyrics or other text.",
-  "main": "index.js",
+  "description": "Transposes musical chords in arbitrary text.",
+  "main": "dist/index.js",
   "dependencies": {
+    "ts-enums": "0.0.6",
     "xregexp": "^3.1.1"
   },
   "devDependencies": {
+    "@types/chai": "^4.1.0",
+    "@types/mocha": "^2.2.46",
+    "@types/node": "^8.5.8",
     "chai": "^3.5.0",
-    "mocha": "*"
+    "coffeescript": "^2.1.1",
+    "mocha": "*",
+    "ts-node": "^4.1.0",
+    "typescript": "^2.6.2",
+    "typescript-formatter": "^7.0.1"
   },
   "scripts": {
-    "test": "mocha test.js"
+    "build": "tsfmt -r && tsc",
+    "test": "npm run build && mocha -r ts-node/register test/test.ts"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/frigidrain/chord-transposer.git"
+    "url": "git+https://github.com/ddycai/chord-transposer.git"
   },
   "keywords": [
     "transpose",
@@ -26,10 +35,10 @@
     "lyrics",
     "tabs"
   ],
-  "author": "frigidrain",
+  "author": "Duncan Cai",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/frigidrain/chord-transposer/issues"
+    "url": "https://github.com/ddycai/chord-transposer/issues"
   },
-  "homepage": "https://github.com/frigidrain/chord-transposer#readme"
+  "homepage": "https://github.com/ddycai/chord-transposer#readme"
 }

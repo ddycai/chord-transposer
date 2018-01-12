@@ -1,11 +1,8 @@
 Chord Transposer
 ========
 
-A Javascript library for transposing musical chords, including chords embedded
-in text such as those found in lyrics/tabs. The transposer distinguishes between
-chords and regular text, only tranposing chords and preserving whitespace.
-
-The library is unit tested, and tests can be found in `test.js`.
+Javascript/TypeScript library for transposing musical chords within arbitrary
+text.
 
 ## Usage
 
@@ -15,139 +12,117 @@ Install via npm:
 npm install chord-transposer
 ```
 
-`require` the package:
+Import the package using your preferred import syntax:
 
 ```javascript
-var Transposer = require('chord-transposer');
+const Transposer = require('chord-transposer');
+
+import * as Transposer from 'chord-transposer';
+
+import { transpose } from 'chord-transposer';
 ```
 
-### Transposing to a Specific Key
+## Transposing
 
-Given some text containing chords, you can transpose it to any other key using
-`toKey`.
+To a certain key signature:
 
 ```javascript
-// Transpose from F major to D major.
-> Transposer.transpose('F  C7 Bb   \nHello world').fromKey('F').toKey('D')
-// output:
-{ text: 'D  A7 G   \nHello world',
-  key: 'D',
-  original_key: 'F',
-  offset: 9 }
+> Transposer.transpose('F  C7 Bb   \nHello world').fromKey('F').toKey('D').toString()
+'D  A7 G   \nHello world'
 
-// Transpose from F minor to D minor.
-> Transposer.transpose('Fm  C Ab   \nHello world').fromKey('Fm').toKey('Dm')
-{ text: 'Dm  A F   \nHello world',
-  key: 'F',
-  original_key: 'Ab',
-  offset: 9 }
+> Transposer.transpose('Fm  C Ab   \nHello world').fromKey('Fm').toKey('Dm').toString()
+'Dm  A F   \nHello world'
 ```
 
-`offset` is the number of semitones between the original key and your new key.
-The offset is always given as a positive number.
-
-**Note** The key returned by the Transposer is always the relative major.
-Therefore, you will get `F` even if you are transposing to `Dm`. You can get the
-relative minor using this helper function:
+`up` or `down` any number of semitones:
 
 ```javascript
-// Get the relative minor of F major.
-> Transposer.getRelativeMinor('F') + 'm'
-'Dm'
-```
+// Up 7 semitones.
+> Transposer.transpose('F  Am Bb   \nHello world').fromKey('F').up(7).toString()
+'C  Em F   \nHello world'
 
-`Transposer.getRelativeMajor` also exists to do the reverse.
-
-### Transposing Up or Down Semitones
-
-You can also transpose up or down any number of semitones.
-
-```javascript
-// Transpose up 7 semitones from F major.
-> Transposer.transpose('F  Am Bb   \nHello world').fromKey('F').up(7)
-{ text: 'C  Em F   \nHello world',
-  key: 'C',
-  original_key: 'F',
-  offset: 7 }
-
-// Transpose down 4 semitones from F major.
-> Transposer.transpose('F  Am Bb   \nHello world').fromKey('F').down(4)
-{ text: 'Db  Fm Gb   \nHello world',
-  key: 'Db',
-  original_key: 'F',
-  offset: 8 }
+// Down 4 semitones.
+> Transposer.transpose('F  Am Bb   \nHello world').fromKey('F').down(4).toString()
+'Db  Fm Gb   \nHello world'
 ```
 
 ### Auto Key Signature
 
-You can choose not to specify the current key. Transposer will choose the first
-chord of your text to be the key signature.
+If the key signature is not specified, the key will be inferred from the first
+chord.
 
 ```javascript
-> Transposer.transpose('F  C7 Bb   \nHello world').toKey('D')
-{ text: 'D  A7 G   \nHello world',
-  key: 'D',
-  original_key: 'F',
-  offset: 9 }
+> Transposer.transpose('F  C7 Bb   \nHello world').toKey('D').toString()
+'D  A7 G   \nHello world'
 
-> Transposer.transpose('Fm  C Ab   \nHello world').toKey('Dm')
-{ text: 'Dm  A F   \nHello world',
-  key: 'F',
-  original_key: 'Ab',
-  offset: 9 }
+> Transposer.transpose('Fm  C Ab   \nHello world').toKey('Dm').toString()
+'Dm  A F   \nHello world'
 
 > Transposer.transpose('F  Am Bb   \nHello world').up(7)
-{ text: 'C  Em F   \nHello world',
-  key: 'C',
-  original_key: 'F',
-  offset: 7 }
+'C  Em F   \nHello world'
 ```
 
 ### Supported Chords
 
-Various types of chords are supported:
+```javascript
+> Transposer.transpose('C Cmaj CM Cm/F C7/F Csus4').toKey('F').toString()
+'F Fmaj FM Fm/Bb F7/Bb Fsus4'
 
-```java
-> Transposer.transpose('C Cmaj CM').toKey('F')
-{ text: 'F Fmaj FM', key: 'F', original_key: 'C', offset: 5 }
-
-> Transposer.transpose('Cm Cmin C-').toKey('F')
-{ text: 'Dm Dmin D-', key: 'F', original_key: 'Eb', offset: 2 }
-
-> Transposer.transpose('Cdim').toKey('F')
-{ text: 'Fdim', key: 'F', original_key: 'C', offset: 5 }
-
-> Transposer.transpose('Caug C+ C+5').toKey('F')
-{ text: 'Faug F+ F+5', key: 'F', original_key: 'C', offset: 5 }
-
-> Transposer.transpose('C/F C7/F Cm/F').toKey('F')
-{ text: 'F/Bb F7/Bb Fm/Bb',
-  key: 'F',
-  original_key: 'C',
-  offset: 5 }
+> Transposer.transpose('Cm Cmin C- Cdim Caug C+ C+5').toKey('Dm').toString()
+'Dm Dmin D- Ddim Daug D+ D+5'
 ```
 
-### Formatter
+## Parsing
 
-You can pass in a formatter to format the chord symbols. A formatter takes the
-chord symbol and an ID and returns the formatted chord. For each unique chord, a
-unique ID (starting from 0, increasing by 1 for each unique chord) is assigned
-and passed to the formatter.
-
-You can use this to give each chord a unique colour by mapping each id to a
-colour, for example.
-
-To surround chords with a `<span>`:
+When text is passed into `transpose`, it is parsed into an
+`Array<Array<string|Chord>>`. You can access these through `tokens` to parse
+however you like:
 
 ```javascript
-// Transpose and put each chord in a span.
-> Transposer.transpose('F  C7 Bb   \nHello world').withFormatter(
-      function(sym, id) {
-        return '<span>' + sym + '</span>';
-      }).toKey('Bb')
-// output
-{ text: '<span>Bb</span>  <span>F7</span> <span>Eb</span>   \nHello world',
-  key: 'Bb',
-  original_key: 'F',
-  offset: 5 }
+> Transposer
+    .transpose('C  G  Am  G7/B  C    F  C   F   G7\nO Canada  Our home and native land')
+    .tokens
+[ [ Chord { root: 'C', suffix: '', bass: undefined },
+    '  ',
+    Chord { root: 'G', suffix: '', bass: undefined },
+    '  ',
+    Chord { root: 'A', suffix: 'm', bass: undefined },
+    '  ',
+    Chord { root: 'G', suffix: '7', bass: 'B' },
+    '  ',
+    Chord { root: 'C', suffix: '', bass: undefined },
+    '    ',
+    Chord { root: 'F', suffix: '', bass: undefined },
+    '  ',
+    Chord { root: 'C', suffix: '', bass: undefined },
+    '   ',
+    Chord { root: 'F', suffix: '', bass: undefined },
+    '   ',
+    Chord { root: 'G', suffix: '7', bass: undefined } ],
+  [ 'O Canada  Our home and native land' ] ]
 ```
+
+### Key Signatures
+
+You can see the current key signature of the text through `currentKey`.
+
+```javascript
+> Transposer.transpose('C  G').currentKey
+KeySignature {
+  _description: 'C',
+  _ordinal: 0,
+  majorKey: 'C',
+  relativeMinor: 'Am',
+  keyType: 1,
+  rank: 0,
+  _propName: 'C' }
+
+> Transposer.transpose('C  G').up(4).currentKey
+KeySignature {
+  _description: 'E',
+  _ordinal: 4,
+  majorKey: 'E',
+  relativeMinor: 'C#m',
+  keyType: 1,
+  rank: 4,
+  _propName: 'E' }
