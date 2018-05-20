@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "dependencies": {
     "ts-enums": "0.0.6",
-    "xregexp": "^3.1.1"
+    "xregexp": "^4.1.1"
   },
   "devDependencies": {
     "@types/chai": "^4.1.0",
