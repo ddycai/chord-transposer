@@ -26,54 +26,44 @@ var Transposer = /** @class */ (function () {
         else {
             throw new Error('Invalid argument (must be text or parsed text).');
         }
-        this.guessKey();
     }
     Transposer.transpose = function (text) {
         return new Transposer(text);
     };
     /** Guesses the key of the text. Currently just takes the first chord. */
-    Transposer.prototype.guessKey = function () {
+    Transposer.prototype.getKey = function () {
         if (this.currentKey) {
-            return;
+            return this.currentKey;
         }
         for (var _i = 0, _a = this.tokens; _i < _a.length; _i++) {
             var line = _a[_i];
             for (var _b = 0, line_1 = line; _b < line_1.length; _b++) {
                 var token = line_1[_b];
                 if (token instanceof Chord) {
-                    if (MINOR_CHORD_REGEX.test(token.toString())) {
-                        this.currentKey = KeySignatures_1.KeySignatures.valueOf(token.root + 'm');
-                    }
-                    else {
-                        this.currentKey = KeySignatures_1.KeySignatures.valueOf(token.root);
-                    }
-                    return;
+                    return KeySignatures_1.KeySignatures.valueOf(token.root + (MINOR_CHORD_REGEX.test(token.toString()) ? 'm' : ''));
                 }
             }
         }
         throw new Error('Given text has no chords');
     };
     Transposer.prototype.fromKey = function (key) {
-        this.currentKey = KeySignatures_1.KeySignatures.valueOf(key);
+        this.currentKey = key instanceof KeySignatures_1.KeySignature ? key : KeySignatures_1.KeySignatures.valueOf(key);
         return this;
     };
     Transposer.prototype.up = function (semitones) {
-        var newKey = transposeKey(this.currentKey, semitones);
-        this.tokens = _transpose(this.tokens, this.currentKey, newKey);
-        this.currentKey = newKey;
-        return this;
+        var key = this.getKey();
+        var newKey = transposeKey(key, semitones);
+        var tokens = _transpose(this.tokens, key, newKey);
+        return new Transposer(tokens).fromKey(newKey);
     };
     Transposer.prototype.down = function (semitones) {
-        var newKey = transposeKey(this.currentKey, -semitones);
-        this.tokens = _transpose(this.tokens, this.currentKey, newKey);
-        this.currentKey = newKey;
-        return this;
+        return this.up(-semitones);
     };
-    Transposer.prototype.toKey = function (key) {
-        var newKey = KeySignatures_1.KeySignatures.valueOf(key);
-        this.tokens = _transpose(this.tokens, this.currentKey, newKey);
-        this.currentKey = newKey;
-        return this;
+    Transposer.prototype.toKey = function (toKey) {
+        var key = this.getKey();
+        var newKey = KeySignatures_1.KeySignatures.valueOf(toKey);
+        var tokens = _transpose(this.tokens, key, newKey);
+        return new Transposer(tokens).fromKey(newKey);
     };
     /** Returns a string representation of the text. */
     Transposer.prototype.toString = function () {
@@ -175,17 +165,7 @@ function parse(text, threshold) {
  */
 function _transpose(tokens, fromKey, toKey) {
     var noteMap = transpositionMap(fromKey, toKey);
-    for (var _i = 0, tokens_2 = tokens; _i < tokens_2.length; _i++) {
-        var line = tokens_2[_i];
-        for (var _a = 0, line_2 = line; _a < line_2.length; _a++) {
-            var token = line_2[_a];
-            if (token instanceof Chord) {
-                token.root = noteMap[token.root];
-                token.bass = noteMap[token.bass];
-            }
-        }
-    }
-    return tokens;
+    return tokens.map(function (line) { return line.map(function (token) { return token instanceof Chord ? new Chord(noteMap[token.root], token.suffix, noteMap[token.bass]) : token; }); });
 }
 /**
  * Given the current key and the number of semitones to transpose, returns a

@@ -104,10 +104,10 @@ however you like:
 
 ### Key Signatures
 
-You can see the current key signature of the text through `currentKey`.
+You can see the current key signature of the text through `getKey()`.
 
 ```javascript
-> Transposer.transpose('C  G').currentKey
+> Transposer.transpose('C  G').getKey()
 KeySignature {
   _description: 'C',
   _ordinal: 0,
@@ -117,7 +117,7 @@ KeySignature {
   rank: 0,
   _propName: 'C' }
 
-> Transposer.transpose('C  G').up(4).currentKey
+> Transposer.transpose('C  G').up(4).getKey()
 KeySignature {
   _description: 'E',
   _ordinal: 4,

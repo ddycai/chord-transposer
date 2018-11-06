@@ -21,7 +21,7 @@ const MINOR_CHORD_REGEX = XRegExp(`^${ROOT_PATTERN}${MINOR_PATTERN}.*$`);
 /** Fluent API for transposing text containing chords. */
 class Transposer {
   tokens: any[][];
-  currentKey: KeySignature;
+  currentKey?: KeySignature;
 
   static transpose(text: string | any[][]) {
     return new Transposer(text);
@@ -35,60 +35,45 @@ class Transposer {
     } else {
       throw new Error('Invalid argument (must be text or parsed text).');
     }
-    this.guessKey();
   }
 
-  /** Guesses the key of the text. Currently just takes the first chord. */
-  guessKey(): KeySignature {
+  /** Get the key of the text. If not explicitly set, it will be guessed from the first chord. */
+  getKey(): KeySignature {
     if (this.currentKey) {
-      return;
+      return this.currentKey;
     }
 
     for (let line of this.tokens) {
       for (let token of line) {
         if (token instanceof Chord) {
-          if (MINOR_CHORD_REGEX.test(token.toString())) {
-            this.currentKey = KeySignatures.valueOf(token.root + 'm');
-          } else {
-            this.currentKey = KeySignatures.valueOf(token.root);
-          }
-          return;
+          return KeySignatures.valueOf(token.root + (MINOR_CHORD_REGEX.test(token.toString()) ? 'm' : ''));
         }
       }
     }
     throw new Error('Given text has no chords');
   }
 
-  fromKey(key: string): Transposer {
-    this.currentKey = KeySignatures.valueOf(key);
+  fromKey(key: string | KeySignature): Transposer {
+    this.currentKey = key instanceof KeySignature ? key : KeySignatures.valueOf(key);
     return this;
   }
 
   up(semitones: number): Transposer {
-    let newKey = transposeKey(this.currentKey, semitones);
-    this.tokens = _transpose(this.tokens,
-      this.currentKey,
-      newKey);
-    this.currentKey = newKey;
-    return this;
+    const key = this.getKey();
+    const newKey = transposeKey(key, semitones);
+    const tokens = _transpose(this.tokens, key, newKey);
+    return new Transposer(tokens).fromKey(newKey);
   }
 
   down(semitones: number): Transposer {
-    let newKey = transposeKey(this.currentKey, -semitones);
-    this.tokens = _transpose(this.tokens,
-      this.currentKey,
-      newKey);
-    this.currentKey = newKey;
-    return this;
+    return this.up(-semitones);
   }
 
-  toKey(key: string): Transposer {
-    let newKey = KeySignatures.valueOf(key);
-    this.tokens = _transpose(this.tokens,
-      this.currentKey,
-      newKey);
-    this.currentKey = newKey;
-    return this;
+  toKey(toKey: string): Transposer {
+    const key = this.getKey();
+    const newKey = KeySignatures.valueOf(toKey);
+    const tokens = _transpose(this.tokens, key, newKey);
+    return new Transposer(tokens).fromKey(newKey);
   }
 
   /** Returns a string representation of the text. */
@@ -195,16 +180,7 @@ function _transpose(tokens: any[][],
 
   const noteMap = transpositionMap(fromKey, toKey);
 
-  for (let line of tokens) {
-    for (let token of line) {
-      if (token instanceof Chord) {
-        token.root = noteMap[token.root];
-        token.bass = noteMap[token.bass];
-      }
-    }
-  }
-
-  return tokens;
+  return tokens.map(line => line.map(token => token instanceof Chord ? new Chord(noteMap[token.root], token.suffix, noteMap[token.bass]) : token));
 }
 
 /**
@@ -234,6 +210,6 @@ function semitonesBetween(a: KeySignature, b: KeySignature) {
   return b.rank - a.rank;
 }
 
-export const transpose = text => new Transposer(text);
+export const transpose = (text: string) => new Transposer(text);
 
 export default Transposer;

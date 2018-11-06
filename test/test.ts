@@ -136,11 +136,11 @@ describe('Transposer', () => {
 
   it ("The resulting keys are correct", () => {
     for (let i = 0; i < 12; i++) {
-      expect(transpose('C').up(i).currentKey.majorKey)
+      expect(transpose('C').up(i).getKey().majorKey)
         .to.equal(KEYS[i]);
     }
     for (let i = 0; i < 12; i++) {
-      expect(transpose('C').toKey(KEYS[i]).currentKey.majorKey)
+      expect(transpose('C').toKey(KEYS[i]).getKey().majorKey)
         .to.equal(KEYS[i]);
     }
   });
@@ -225,5 +225,10 @@ describe('Transposer', () => {
   it ("Handles sequence of chords separated by dash", () => {
     expect(transpose("A-E-F#m-D").up(1).toString())
       .to.equal("Bb-F-Gm-Eb");
+  });
+
+  it ("Should not try to guess the key if an explicit key is provided", () => {
+    expect(transpose("G#").fromKey("C#m").toKey("Cm").toString())
+      .to.equal("G")
   });
 });
