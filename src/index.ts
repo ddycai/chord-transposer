@@ -180,7 +180,9 @@ function _transpose(tokens: any[][],
 
   const noteMap = transpositionMap(fromKey, toKey);
 
-  return tokens.map(line => line.map(token => token instanceof Chord ? new Chord(noteMap[token.root], token.suffix, noteMap[token.bass]) : token));
+  return tokens.map(line =>
+      line.map(token =>
+          token instanceof Chord ? new Chord(noteMap[token.root], token.suffix, noteMap[token.bass]) : token));
 }
 
 /**
