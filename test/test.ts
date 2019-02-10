@@ -157,8 +157,6 @@ describe('Transposer', () => {
   });
 
   it ("An error should be thrown for invalid key signature", () => {
-    expect(() => { return transpose(C_MAJOR).toKey('D#').toString(); })
-      .to.throw(Error, 'not a valid key signature');
     expect(() => { return transpose(C_MAJOR).toKey('blah').toString(); })
       .to.throw(Error, 'blah is not a valid key signature.');
   });

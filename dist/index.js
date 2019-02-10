@@ -30,7 +30,7 @@ var Transposer = /** @class */ (function () {
     Transposer.transpose = function (text) {
         return new Transposer(text);
     };
-    /** Guesses the key of the text. Currently just takes the first chord. */
+    /** Get the key of the text. If not explicitly set, it will be guessed from the first chord. */
     Transposer.prototype.getKey = function () {
         if (this.currentKey) {
             return this.currentKey;
@@ -165,7 +165,11 @@ function parse(text, threshold) {
  */
 function _transpose(tokens, fromKey, toKey) {
     var noteMap = transpositionMap(fromKey, toKey);
-    return tokens.map(function (line) { return line.map(function (token) { return token instanceof Chord ? new Chord(noteMap[token.root], token.suffix, noteMap[token.bass]) : token; }); });
+    return tokens.map(function (line) {
+        return line.map(function (token) {
+            return token instanceof Chord ? new Chord(noteMap[token.root], token.suffix, noteMap[token.bass]) : token;
+        });
+    });
 }
 /**
  * Given the current key and the number of semitones to transpose, returns a
