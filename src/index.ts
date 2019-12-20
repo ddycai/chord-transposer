@@ -11,7 +11,9 @@ const SHARP_SCALE = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#",
 
 // Regex for recognizing chords
 const ROOT_PATTERN = '(?<root>[A-G](#|b)?)';
-const SUFFIX_PATTERN = '(?<suffix>\\(?(M|maj|major|m|min|minor|dim|sus|dom|aug)?(\\+|-|add)?\\d*\\)?)';
+const TRIAD_PATTERN = '(M|maj|major|m|min|minor|dim|sus|dom|aug|\\+|-)';
+const ADDED_TONE_PATTERN = '(([/\\.\\+]|add)?\\d+[\\+-]?)';
+const SUFFIX_PATTERN = `(?<suffix>\\(?${TRIAD_PATTERN}?${ADDED_TONE_PATTERN}*\\)?)`;
 const BASS_PATTERN = '(\\/(?<bass>[A-G](#|b)?))?';
 const MINOR_PATTERN = '(m|min|minor)+';
 

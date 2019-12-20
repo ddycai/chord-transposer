@@ -9,7 +9,9 @@ var FLAT_SCALE = ["C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "C
 var SHARP_SCALE = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
 // Regex for recognizing chords
 var ROOT_PATTERN = '(?<root>[A-G](#|b)?)';
-var SUFFIX_PATTERN = '(?<suffix>\\(?(M|maj|major|m|min|minor|dim|sus|dom|aug)?(\\+|-|add)?\\d*\\)?)';
+var TRIAD_PATTERN = '(M|maj|major|m|min|minor|dim|sus|dom|aug|\\+|-)';
+var ADDED_TONE_PATTERN = '(([/\\.\\+]|add)?\\d+[\\+-]?)';
+var SUFFIX_PATTERN = "(?<suffix>\\(?" + TRIAD_PATTERN + "?" + ADDED_TONE_PATTERN + "*\\)?)";
 var BASS_PATTERN = '(\\/(?<bass>[A-G](#|b)?))?';
 var MINOR_PATTERN = '(m|min|minor)+';
 var CHORD_REGEX = XRegExp("^" + ROOT_PATTERN + SUFFIX_PATTERN + BASS_PATTERN + "$");

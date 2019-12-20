@@ -204,6 +204,12 @@ describe('Transposer', () => {
         .to.equal('Bsus4 Bsus6');
   });
 
+  it ("Transposes chords with complex added tones", () => {
+    expect(transpose('Cadd9 C7/9 Cm7/5- C7/9/11+ C7+/9 C7.11+')
+              .toKey('F').toString())
+        .to.equal('Fadd9 F7/9 Fm7/5- F7/9/11+ F7+/9 F7.11+');
+  });
+
   it ("Transposes bass chords to the right key", () => {
     expect(transpose('A/D').up(2).toString()).to.equal('B/E');
     expect(transpose('G/F').up(1).toString()).to.equal('Ab/Gb');
