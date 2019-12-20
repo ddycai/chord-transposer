@@ -5,18 +5,17 @@
   "main": "dist/index.js",
   "dependencies": {
     "ts-enums": "0.0.6",
-    "xregexp": "^4.1.1"
+    "xregexp": "^4.2.4"
   },
   "devDependencies": {
-    "@types/chai": "^4.1.0",
-    "@types/mocha": "^2.2.46",
-    "@types/node": "^8.5.8",
-    "chai": "^3.5.0",
-    "coffeescript": "^2.1.1",
-    "mocha": "*",
-    "ts-node": "^4.1.0",
-    "typescript": "^2.6.2",
-    "typescript-formatter": "^7.0.1"
+    "@types/chai": "^4.2.7",
+    "@types/mocha": "^5.2.7",
+    "@types/node": "^12.12.21",
+    "chai": "^4.2.0",
+    "mocha": "^6.2.2",
+    "ts-node": "^8.5.4",
+    "typescript": "^3.7.3",
+    "typescript-formatter": "^7.2.2"
   },
   "scripts": {
     "build": "tsfmt -r && tsc",
