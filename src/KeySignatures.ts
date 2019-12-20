@@ -52,6 +52,17 @@ class KeySignatureEnum extends Enum<KeySignature> {
   B: KeySignature =
     new KeySignature('B', 'G#m', KeyType.SHARP, 11);
 
+  // Unconventional key signatures:
+
+  Csharp: KeySignature =
+    new KeySignature('C#', '', KeyType.SHARP, 1);
+
+  Dsharp: KeySignature =
+    new KeySignature('D#', '', KeyType.SHARP, 3);
+
+  Gsharp: KeySignature =
+    new KeySignature('G#', '', KeyType.SHARP, 8);
+
   constructor() {
     super();
     this.initEnum('KeySignature');
@@ -60,7 +71,8 @@ class KeySignatureEnum extends Enum<KeySignature> {
   /** Returns the enum constant with the specific name. */
   valueOf(name: string): KeySignature {
     for (let key of this.values) {
-      if (key.majorKey === name || key.relativeMinor === name) {
+      if (key.majorKey === name
+        || (key.relativeMinor && key.relativeMinor === name)) {
         return key;
       }
     }

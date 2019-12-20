@@ -90,6 +90,17 @@ describe('Transposer', () => {
       .to.equal(C_MAJOR);
   });
 
+  it ("The correct scales should be returned for unconventional key signatures", () => {
+    expect(transpose(C_MAJOR).toKey('C#').toString())
+      .to.equal('C# D# F F# G# A# C C#');
+
+    expect(transpose(C_MAJOR).toKey('D#').toString())
+      .to.equal('D# F G G# A# C D D#');
+
+    expect(transpose(C_MAJOR).toKey('G#').toString())
+      .to.equal('G# A# C C# D# F G G#');
+  });
+
   it ("The correct scales should be returned for each minor key signature", () => {
     expect(transpose(C_MINOR).toKey('C#m').toString())
       .to.equal('C#m D#dim E F#m G#m A B C#m');
@@ -157,8 +168,6 @@ describe('Transposer', () => {
   });
 
   it ("An error should be thrown for invalid key signature", () => {
-    expect(() => { return transpose(C_MAJOR).toKey('D#').toString(); })
-      .to.throw(Error, 'not a valid key signature');
     expect(() => { return transpose(C_MAJOR).toKey('blah').toString(); })
       .to.throw(Error, 'blah is not a valid key signature.');
   });
