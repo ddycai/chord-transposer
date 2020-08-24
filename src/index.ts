@@ -22,16 +22,16 @@ const MINOR_CHORD_REGEX = XRegExp(`^${ROOT_PATTERN}${MINOR_PATTERN}.*$`);
 
 /** Fluent API for transposing text containing chords. */
 class Transposer {
-  tokens: any[][];
+  tokens: Array<Chord | string>[];
   currentKey?: KeySignature;
 
-  static transpose(text: string | any[][]) {
+  static transpose(text: string | Array<Chord | string>[]) {
     return new Transposer(text);
   }
 
-  constructor(text: string | any[][]) {
+  constructor(text: string | Array<Chord | string>[]) {
     if (typeof text === "string") {
-      this.tokens = parse(text);
+      this.tokens = tokenize(text);
     } else if (text instanceof Array) {
       this.tokens = text;
     } else {
@@ -63,7 +63,7 @@ class Transposer {
   up(semitones: number): Transposer {
     const key = this.getKey();
     const newKey = transposeKey(key, semitones);
-    const tokens = _transpose(this.tokens, key, newKey);
+    const tokens = transposeTokens(this.tokens, key, newKey);
     return new Transposer(tokens).fromKey(newKey);
   }
 
@@ -74,7 +74,7 @@ class Transposer {
   toKey(toKey: string): Transposer {
     const key = this.getKey();
     const newKey = KeySignatures.valueOf(toKey);
-    const tokens = _transpose(this.tokens, key, newKey);
+    const tokens = transposeTokens(this.tokens, key, newKey);
     return new Transposer(tokens).fromKey(newKey);
   }
 
@@ -92,7 +92,7 @@ class Transposer {
  * Finds the key that is a specified number of semitones above/below the current
  * key.
  */
-function transposeKey(currentKey: KeySignature, semitones: number) {
+function transposeKey(currentKey: KeySignature, semitones: number): KeySignature {
   const newRank = (currentKey.rank + semitones + N_KEYS) % N_KEYS;
   return KeySignatures.forRank(newRank);
 }
@@ -123,29 +123,29 @@ class Chord {
   }
 }
 
-/** Parses the given text into chords.
+/** Tokenize the given text into chords.
  *  
  *  The ratio of chords to non-chord tokens in each line must be greater than
  *  the given threshold in order for the line to be transposed. The threshold
  *  is set to 0.5 by default.
  */
-function parse(text: string, threshold?: number): any[][] {
+function tokenize(text: string, threshold?: number): Array<Chord | string>[] {
   if (threshold === undefined) {
     threshold = 0.5;
   }
   const lines: Array<string> = text.split("\n");
 
-  const newText: any[][] = [];
+  const newText: Array<Chord | string>[] = [];
 
   for (let line of lines) {
-    const newLine: any[] = [];
+    const newLine: Array<Chord | string> = [];
     let chordCount: number = 0;
     let tokenCount: number = 0;
     const tokens: string[] = line.split(/(\s+|-)/g);
 
     let lastTokenWasString: boolean = false;
     for (let token of tokens) {
-      let isTokenEmpty = token.trim() === '';
+      let isTokenEmpty = token.trim() === "";
       if (!isTokenEmpty && CHORD_REGEX.test(token)) {
         const chord: Chord = Chord.parse(token);
         newLine.push(chord);
@@ -176,26 +176,69 @@ function parse(text: string, threshold?: number): any[][] {
 /**
  * Transposes the given parsed text (by the parse() function) to another key.
  */
-function _transpose(tokens: any[][],
+function transposeTokens(
+  tokens: Array<Chord | string>[],
   fromKey: KeySignature,
-  toKey: KeySignature) {
-
-  const noteMap = transpositionMap(fromKey, toKey);
-
-  return tokens.map(line =>
-    line.map(token =>
-      token instanceof Chord ? new Chord(noteMap[token.root], token.suffix, noteMap[token.bass]) : token));
+  toKey: KeySignature
+): Array<Chord | string>[] {
+  const transpositionMap = createTranspositionMap(fromKey, toKey);
+  let result = [];
+  for (let line of tokens) {
+    let accumulator = [];
+    let spaceDebt = 0;
+    line.forEach((token, i) => {
+      if (typeof token === "string") {
+        if (spaceDebt > 0) {
+          const numSpaces = token.search(/\S|$/);
+          const spacesToTake = Math.min(spaceDebt, numSpaces);
+          accumulator.push(token.substring(spacesToTake));
+          spaceDebt = 0;
+        } else if (typeof accumulator[accumulator.length - 1] === "string") {
+          accumulator.push(accumulator.pop() + token);
+        } else {
+          accumulator.push(token);
+        }
+      } else {
+        const transposedChord = new Chord(
+          transpositionMap.get(token.root),
+          token.suffix,
+          transpositionMap.get(token.bass)
+        );
+        const originalChordLen = token.toString().length;
+        const transposedChordLen = transposedChord.toString().length;
+        // Handle length differences between chord and transposed chord.
+        if (originalChordLen > transposedChordLen) {
+          // Pad right with spaces.
+          accumulator.push(transposedChord);
+          if (i < line.length - 1) {
+            accumulator.push(" ".repeat(originalChordLen - transposedChordLen));
+          }
+        } else if (originalChordLen < transposedChordLen) {
+          // Remove spaces from the right (if possible).
+          spaceDebt += transposedChordLen - originalChordLen;
+          accumulator.push(transposedChord);
+        } else {
+          accumulator.push(transposedChord);
+        }
+      }
+    });
+    result.push(accumulator);
+  }
+  return result;
 }
 
 /**
  * Given the current key and the number of semitones to transpose, returns a
  * mapping from each note to a transposed note.
  */
-function transpositionMap(currentKey: KeySignature, newKey: KeySignature) {
-  const map = {};
+function createTranspositionMap(
+  currentKey: KeySignature,
+  newKey: KeySignature
+): Map<string, string> {
+  const map = new Map<string, string>();
   const semitones = semitonesBetween(currentKey, newKey);
 
-  let scale;
+  let scale: string[];
   if (newKey.keyType == KeyType.FLAT) {
     scale = FLAT_SCALE;
   } else {
@@ -203,14 +246,14 @@ function transpositionMap(currentKey: KeySignature, newKey: KeySignature) {
   }
 
   for (let i = 0; i < N_KEYS; i++) {
-    map[FLAT_SCALE[i]] = scale[(i + semitones + N_KEYS) % N_KEYS];
-    map[SHARP_SCALE[i]] = scale[(i + semitones + N_KEYS) % N_KEYS];
+    map.set(FLAT_SCALE[i], scale[(i + semitones + N_KEYS) % N_KEYS]);
+    map.set(SHARP_SCALE[i], scale[(i + semitones + N_KEYS) % N_KEYS]);
   }
   return map;
 }
 
 /** Finds the number of semitones between the given keys. */
-function semitonesBetween(a: KeySignature, b: KeySignature) {
+function semitonesBetween(a: KeySignature, b: KeySignature): number {
   return b.rank - a.rank;
 }
 

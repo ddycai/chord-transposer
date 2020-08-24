@@ -20,7 +20,7 @@ var MINOR_CHORD_REGEX = XRegExp("^" + ROOT_PATTERN + MINOR_PATTERN + ".*$");
 var Transposer = /** @class */ (function () {
     function Transposer(text) {
         if (typeof text === "string") {
-            this.tokens = parse(text);
+            this.tokens = tokenize(text);
         }
         else if (text instanceof Array) {
             this.tokens = text;
@@ -55,7 +55,7 @@ var Transposer = /** @class */ (function () {
     Transposer.prototype.up = function (semitones) {
         var key = this.getKey();
         var newKey = transposeKey(key, semitones);
-        var tokens = _transpose(this.tokens, key, newKey);
+        var tokens = transposeTokens(this.tokens, key, newKey);
         return new Transposer(tokens).fromKey(newKey);
     };
     Transposer.prototype.down = function (semitones) {
@@ -64,7 +64,7 @@ var Transposer = /** @class */ (function () {
     Transposer.prototype.toKey = function (toKey) {
         var key = this.getKey();
         var newKey = KeySignatures_1.KeySignatures.valueOf(toKey);
-        var tokens = _transpose(this.tokens, key, newKey);
+        var tokens = transposeTokens(this.tokens, key, newKey);
         return new Transposer(tokens).fromKey(newKey);
     };
     /** Returns a string representation of the text. */
@@ -112,13 +112,13 @@ var Chord = /** @class */ (function () {
     };
     return Chord;
 }());
-/** Parses the given text into chords.
+/** Tokenize the given text into chords.
  *
  *  The ratio of chords to non-chord tokens in each line must be greater than
  *  the given threshold in order for the line to be transposed. The threshold
  *  is set to 0.5 by default.
  */
-function parse(text, threshold) {
+function tokenize(text, threshold) {
     if (threshold === undefined) {
         threshold = 0.5;
     }
@@ -165,20 +165,63 @@ function parse(text, threshold) {
 /**
  * Transposes the given parsed text (by the parse() function) to another key.
  */
-function _transpose(tokens, fromKey, toKey) {
-    var noteMap = transpositionMap(fromKey, toKey);
-    return tokens.map(function (line) {
-        return line.map(function (token) {
-            return token instanceof Chord ? new Chord(noteMap[token.root], token.suffix, noteMap[token.bass]) : token;
+function transposeTokens(tokens, fromKey, toKey) {
+    var transpositionMap = createTranspositionMap(fromKey, toKey);
+    var result = [];
+    var _loop_1 = function (line) {
+        var accumulator = [];
+        var spaceDebt = 0;
+        line.forEach(function (token, i) {
+            if (typeof token === "string") {
+                if (spaceDebt > 0) {
+                    var numSpaces = token.search(/\S|$/);
+                    var spacesToTake = Math.min(spaceDebt, numSpaces);
+                    accumulator.push(token.substring(spacesToTake));
+                    spaceDebt = 0;
+                }
+                else if (typeof accumulator[accumulator.length - 1] === "string") {
+                    accumulator.push(accumulator.pop() + token);
+                }
+                else {
+                    accumulator.push(token);
+                }
+            }
+            else {
+                var transposedChord = new Chord(transpositionMap.get(token.root), token.suffix, transpositionMap.get(token.bass));
+                var originalChordLen = token.toString().length;
+                var transposedChordLen = transposedChord.toString().length;
+                // Handle length differences between chord and transposed chord.
+                if (originalChordLen > transposedChordLen) {
+                    // Pad right with spaces.
+                    accumulator.push(transposedChord);
+                    if (i < line.length - 1) {
+                        accumulator.push(" ".repeat(originalChordLen - transposedChordLen));
+                    }
+                }
+                else if (originalChordLen < transposedChordLen) {
+                    // Remove spaces from the right (if possible).
+                    spaceDebt += transposedChordLen - originalChordLen;
+                    accumulator.push(transposedChord);
+                }
+                else {
+                    accumulator.push(transposedChord);
+                }
+            }
         });
-    });
+        result.push(accumulator);
+    };
+    for (var _i = 0, tokens_2 = tokens; _i < tokens_2.length; _i++) {
+        var line = tokens_2[_i];
+        _loop_1(line);
+    }
+    return result;
 }
 /**
  * Given the current key and the number of semitones to transpose, returns a
  * mapping from each note to a transposed note.
  */
-function transpositionMap(currentKey, newKey) {
-    var map = {};
+function createTranspositionMap(currentKey, newKey) {
+    var map = new Map();
     var semitones = semitonesBetween(currentKey, newKey);
     var scale;
     if (newKey.keyType == KeySignatures_1.KeyType.FLAT) {
@@ -188,8 +231,8 @@ function transpositionMap(currentKey, newKey) {
         scale = SHARP_SCALE;
     }
     for (var i = 0; i < N_KEYS; i++) {
-        map[FLAT_SCALE[i]] = scale[(i + semitones + N_KEYS) % N_KEYS];
-        map[SHARP_SCALE[i]] = scale[(i + semitones + N_KEYS) % N_KEYS];
+        map.set(FLAT_SCALE[i], scale[(i + semitones + N_KEYS) % N_KEYS]);
+        map.set(SHARP_SCALE[i], scale[(i + semitones + N_KEYS) % N_KEYS]);
     }
     return map;
 }
