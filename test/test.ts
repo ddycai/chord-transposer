@@ -196,6 +196,11 @@ describe('Transposer', () => {
            .to.equal('Db   Bbm Fm');
   });
 
+  it ("leaves at least one space between chords", () => {
+    expect(transpose('C Am  Em').toKey('Db').toString())
+           .to.equal('Db Bbm Fm');
+  });
+
   it ("transposes various types of chords", () => {
     expect(transpose('C Cmaj CM').toKey('F').toString())
            .to.equal('F Fmaj FM');

@@ -190,8 +190,10 @@ function transposeTokens(
       if (typeof token === "string") {
         if (spaceDebt > 0) {
           const numSpaces = token.search(/\S|$/);
-          const spacesToTake = Math.min(spaceDebt, numSpaces);
-          accumulator.push(token.substring(spacesToTake));
+          // Keep at least one space.
+          const spacesToTake = Math.min(spaceDebt, numSpaces, token.length - 1);
+          const truncatedToken = token.substring(spacesToTake);
+          accumulator.push(truncatedToken);
           spaceDebt = 0;
         } else if (typeof accumulator[accumulator.length - 1] === "string") {
           accumulator.push(accumulator.pop() + token);
