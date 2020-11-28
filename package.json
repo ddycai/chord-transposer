@@ -5,16 +5,16 @@
   "main": "dist/index.js",
   "dependencies": {
     "ts-enums": "0.0.6",
-    "xregexp": "^4.2.4"
+    "xregexp": "^4.4.0"
   },
   "devDependencies": {
-    "@types/chai": "^4.2.7",
+    "@types/chai": "^4.2.14",
     "@types/mocha": "^5.2.7",
-    "@types/node": "^12.12.21",
+    "@types/node": "^12.19.7",
     "chai": "^4.2.0",
-    "mocha": "^8.1.1",
-    "ts-node": "^8.5.4",
-    "typescript": "^3.7.3",
+    "mocha": "^8.2.1",
+    "ts-node": "^8.10.2",
+    "typescript": "^3.9.7",
     "typescript-formatter": "^7.2.2"
   },
   "scripts": {
