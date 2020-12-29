@@ -1,19 +1,6 @@
-import { KeySignatures, KeySignature, KeyType } from './KeySignatures';
-import * as XRegExp from 'xregexp';
+import { KeySignatures, KeySignature, guessKeySignature, } from "./KeySignatures";
+import { Chord, isChord, CHORD_RANKS } from "./Chord";
 const N_KEYS = 12;
-// Chromatic scale starting from C using flats only.
-const FLAT_SCALE = ["C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "Cb"];
-// Chromatic scale starting from C using sharps only.
-const SHARP_SCALE = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
-// Regex for recognizing chords
-const ROOT_PATTERN = '(?<root>[A-G](#|b)?)';
-const TRIAD_PATTERN = '(M|maj|major|m|min|minor|dim|sus|dom|aug|\\+|-)';
-const ADDED_TONE_PATTERN = '(([/\\.\\+]|add)?\\d+[\\+-]?)';
-const SUFFIX_PATTERN = `(?<suffix>\\(?${TRIAD_PATTERN}?${ADDED_TONE_PATTERN}*\\)?)`;
-const BASS_PATTERN = '(\\/(?<bass>[A-G](#|b)?))?';
-const MINOR_PATTERN = '(m|min|minor)+';
-const CHORD_REGEX = XRegExp(`^${ROOT_PATTERN}${SUFFIX_PATTERN}${BASS_PATTERN}$`);
-const MINOR_CHORD_REGEX = XRegExp(`^${ROOT_PATTERN}${MINOR_PATTERN}.*$`);
 /** Fluent API for transposing text containing chords. */
 class Transposer {
     constructor(text) {
@@ -24,7 +11,7 @@ class Transposer {
             this.tokens = text;
         }
         else {
-            throw new Error('Invalid argument (must be text or parsed text).');
+            throw new Error("Invalid argument (must be text or parsed text).");
         }
     }
     static transpose(text) {
@@ -35,17 +22,18 @@ class Transposer {
         if (this.currentKey) {
             return this.currentKey;
         }
-        for (let line of this.tokens) {
-            for (let token of line) {
+        for (const line of this.tokens) {
+            for (const token of line) {
                 if (token instanceof Chord) {
-                    return KeySignatures.valueOf(token.root + (MINOR_CHORD_REGEX.test(token.toString()) ? 'm' : ''));
+                    return guessKeySignature(token);
                 }
             }
         }
-        throw new Error('Given text has no chords');
+        throw new Error("Given text has no chords");
     }
     fromKey(key) {
-        this.currentKey = key instanceof KeySignature ? key : KeySignatures.valueOf(key);
+        this.currentKey =
+            key instanceof KeySignature ? key : KeySignatures.valueOf(key);
         return this;
     }
     up(semitones) {
@@ -66,10 +54,8 @@ class Transposer {
     /** Returns a string representation of the text. */
     toString() {
         return this.tokens
-            .map(line => line
-            .map(token => token.toString())
-            .join(''))
-            .join('\n');
+            .map((line) => line.map((token) => token.toString()).join(""))
+            .join("\n");
     }
 }
 /**
@@ -79,32 +65,6 @@ class Transposer {
 function transposeKey(currentKey, semitones) {
     const newRank = (currentKey.rank + semitones + N_KEYS) % N_KEYS;
     return KeySignatures.forRank(newRank);
-}
-/**
- * Represents a musical chord. For example, Am7/C would have:
- *
- * root: A
- * suffix: m7
- * bass: C
- */
-class Chord {
-    constructor(root, suffix, bass) {
-        this.root = root;
-        this.suffix = suffix;
-        this.bass = bass;
-    }
-    toString() {
-        if (this.bass) {
-            return this.root + this.suffix + "/" + this.bass;
-        }
-        else {
-            return this.root + this.suffix;
-        }
-    }
-    static parse(token) {
-        const result = XRegExp.exec(token, CHORD_REGEX);
-        return new Chord(result.root, result.suffix, result.bass);
-    }
 }
 /** Tokenize the given text into chords.
  *
@@ -118,15 +78,15 @@ function tokenize(text, threshold) {
     }
     const lines = text.split("\n");
     const newText = [];
-    for (let line of lines) {
+    for (const line of lines) {
         const newLine = [];
         let chordCount = 0;
         let tokenCount = 0;
         const tokens = line.split(/(\s+|-)/g);
         let lastTokenWasString = false;
-        for (let token of tokens) {
-            let isTokenEmpty = token.trim() === "";
-            if (!isTokenEmpty && CHORD_REGEX.test(token)) {
+        for (const token of tokens) {
+            const isTokenEmpty = token.trim() === "";
+            if (!isTokenEmpty && isChord(token)) {
                 const chord = Chord.parse(token);
                 newLine.push(chord);
                 chordCount++;
@@ -159,9 +119,9 @@ function tokenize(text, threshold) {
  */
 function transposeTokens(tokens, fromKey, toKey) {
     const transpositionMap = createTranspositionMap(fromKey, toKey);
-    let result = [];
-    for (let line of tokens) {
-        let accumulator = [];
+    const result = [];
+    for (const line of tokens) {
+        const accumulator = [];
         let spaceDebt = 0;
         line.forEach((token, i) => {
             if (typeof token === "string") {
@@ -213,16 +173,10 @@ function transposeTokens(tokens, fromKey, toKey) {
 function createTranspositionMap(currentKey, newKey) {
     const map = new Map();
     const semitones = semitonesBetween(currentKey, newKey);
-    let scale;
-    if (newKey.keyType == KeyType.FLAT) {
-        scale = FLAT_SCALE;
-    }
-    else {
-        scale = SHARP_SCALE;
-    }
-    for (let i = 0; i < N_KEYS; i++) {
-        map.set(FLAT_SCALE[i], scale[(i + semitones + N_KEYS) % N_KEYS]);
-        map.set(SHARP_SCALE[i], scale[(i + semitones + N_KEYS) % N_KEYS]);
+    const scale = newKey.chromaticScale;
+    for (const [chord, rank] of CHORD_RANKS.entries()) {
+        const newRank = (rank + semitones + N_KEYS) % N_KEYS;
+        map.set(chord, scale[newRank]);
     }
     return map;
 }
