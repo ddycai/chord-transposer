@@ -19,7 +19,7 @@ const Transposer = require('chord-transposer');
 
 import * as Transposer from 'chord-transposer';
 
-import { transpose } from 'chord-transposer';
+import { transpose, Chord, KeySignatures } from 'chord-transposer';
 ```
 
 ## Transposing
