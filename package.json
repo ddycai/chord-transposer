@@ -1,6 +1,6 @@
 {
   "name": "chord-transposer",
-  "version": "2.3.2",
+  "version": "2.4.0",
   "description": "Transposes musical chords in arbitrary text.",
   "main": "dist/index.js",
   "dependencies": {
