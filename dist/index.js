@@ -57,7 +57,7 @@ class Transposer {
     /** Returns a string representation of the text. */
     toString() {
         return this.tokens
-            .map((line) => line.map((token) => token.toString()).join())
+            .map((line) => line.map((token) => token.toString()).join(''))
             .join("\n");
     }
 }
