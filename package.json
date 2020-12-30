@@ -38,5 +38,9 @@
   "bugs": {
     "url": "https://github.com/ddycai/chord-transposer/issues"
   },
-  "homepage": "https://github.com/ddycai/chord-transposer#readme"
+  "homepage": "https://github.com/ddycai/chord-transposer#readme",
+  "exports": {
+    "require": "./dist/index.js",
+    "import": "./dist/esm/wrapper.js"
+  }
 }

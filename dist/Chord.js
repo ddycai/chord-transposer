@@ -1,8 +1,11 @@
-import * as XRegExp from "xregexp";
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.isChord = exports.Chord = exports.MINOR_PATTERN = exports.ROOT_PATTERN = exports.CHORD_RANKS = void 0;
+const XRegExp = require("xregexp");
 /**
  * The rank for each possible chord. Rank is the distance in semitones from C.
  */
-export const CHORD_RANKS = new Map([
+exports.CHORD_RANKS = new Map([
     ["B#", 0],
     ["C", 0],
     ["C#", 1],
@@ -30,10 +33,10 @@ const TRIAD_PATTERN = "(M|maj|major|m|min|minor|dim|sus|dom|aug|\\+|-)";
 const ADDED_TONE_PATTERN = "(([/\\.\\+]|add)?\\d+[\\+-]?)";
 const SUFFIX_PATTERN = `(?<suffix>\\(?${TRIAD_PATTERN}?${ADDED_TONE_PATTERN}*\\)?)`;
 const BASS_PATTERN = "(\\/(?<bass>[A-G](#|b)?))?";
-export const ROOT_PATTERN = "(?<root>[A-G](#|b)?)";
-export const MINOR_PATTERN = "(m|min|minor)+";
-const CHORD_REGEX = XRegExp(`^${ROOT_PATTERN}${SUFFIX_PATTERN}${BASS_PATTERN}$`);
-const MINOR_SUFFIX_REGEX = XRegExp(`^${MINOR_PATTERN}.*$`);
+exports.ROOT_PATTERN = "(?<root>[A-G](#|b)?)";
+exports.MINOR_PATTERN = "(m|min|minor)+";
+const CHORD_REGEX = XRegExp(`^${exports.ROOT_PATTERN}${SUFFIX_PATTERN}${BASS_PATTERN}$`);
+const MINOR_SUFFIX_REGEX = XRegExp(`^${exports.MINOR_PATTERN}.*$`);
 /**
  * Represents a musical chord. For example, Am7/C would have:
  *
@@ -41,7 +44,7 @@ const MINOR_SUFFIX_REGEX = XRegExp(`^${MINOR_PATTERN}.*$`);
  * suffix: m7
  * bass: C
  */
-export class Chord {
+class Chord {
     constructor(root, suffix, bass) {
         this.root = root;
         this.suffix = suffix;
@@ -66,6 +69,8 @@ export class Chord {
         return new Chord(result.root, result.suffix, result.bass);
     }
 }
-export function isChord(token) {
+exports.Chord = Chord;
+function isChord(token) {
     return CHORD_REGEX.test(token);
 }
+exports.isChord = isChord;

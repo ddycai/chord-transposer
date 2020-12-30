@@ -10,7 +10,7 @@ export type Token = Chord | string;
 const N_KEYS = 12;
 
 /** Fluent API for transposing text containing chords. */
-class Transposer {
+export class Transposer {
   tokens: Token[][];
   currentKey?: KeySignature;
 
@@ -71,7 +71,7 @@ class Transposer {
   /** Returns a string representation of the text. */
   toString(): string {
     return this.tokens
-      .map((line) => line.map((token) => token.toString()).join(""))
+      .map((line) => line.map((token) => token.toString()).join())
       .join("\n");
   }
 }
@@ -220,5 +220,13 @@ function semitonesBetween(a: KeySignature, b: KeySignature): number {
 }
 
 export const transpose = (text: string) => new Transposer(text);
+export { Chord } from "./Chord";
+export { KeySignature, KeySignatures } from "./KeySignatures";
 
-export default Transposer;
+export default {
+  transpose,
+  Chord,
+  KeySignature,
+  KeySignatures,
+  Transposer,
+};

@@ -1,6 +1,9 @@
-import { Enum, EnumValue } from 'ts-enums';
-import { Chord, ROOT_PATTERN, MINOR_PATTERN } from './Chord';
-import * as XRegExp from 'xregexp';
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.KeySignatures = exports.guessKeySignature = exports.KeySignature = exports.KeyType = exports.C_FLAT_SCALE = exports.G_FLAT_SCALE = exports.C_SHARP_SCALE = exports.F_SHARP_SCALE = void 0;
+const ts_enums_1 = require("ts-enums");
+const Chord_1 = require("./Chord");
+const XRegExp = require("xregexp");
 // Chromatic scale starting from C using flats only.
 const FLAT_SCALE = [
     "C",
@@ -32,20 +35,20 @@ const SHARP_SCALE = [
     "B",
 ];
 // Chromatic scale for F# major which includes E#.
-export const F_SHARP_SCALE = SHARP_SCALE.map(note => note === "F" ? "E#" : note);
+exports.F_SHARP_SCALE = SHARP_SCALE.map(note => note === "F" ? "E#" : note);
 // Chromatic scale for C# major which includes E# and B#.
-export const C_SHARP_SCALE = F_SHARP_SCALE.map(note => note === "C" ? "B#" : note);
+exports.C_SHARP_SCALE = exports.F_SHARP_SCALE.map(note => note === "C" ? "B#" : note);
 // Chromatic scale for Gb major which includes Cb.
-export const G_FLAT_SCALE = FLAT_SCALE.map(note => note === "B" ? "Cb" : note);
+exports.G_FLAT_SCALE = FLAT_SCALE.map(note => note === "B" ? "Cb" : note);
 // Chromatic scale for Cb major which includes Cb and Fb.
-export const C_FLAT_SCALE = G_FLAT_SCALE.map(note => note === "E" ? "Fb" : note);
-const KEY_SIGNATURE_REGEX = XRegExp(`${ROOT_PATTERN}(${MINOR_PATTERN})?`);
-export var KeyType;
+exports.C_FLAT_SCALE = exports.G_FLAT_SCALE.map(note => note === "E" ? "Fb" : note);
+const KEY_SIGNATURE_REGEX = XRegExp(`${Chord_1.ROOT_PATTERN}(${Chord_1.MINOR_PATTERN})?`);
+var KeyType;
 (function (KeyType) {
     KeyType[KeyType["FLAT"] = 0] = "FLAT";
     KeyType[KeyType["SHARP"] = 1] = "SHARP";
-})(KeyType || (KeyType = {}));
-export class KeySignature extends EnumValue {
+})(KeyType = exports.KeyType || (exports.KeyType = {}));
+class KeySignature extends ts_enums_1.EnumValue {
     constructor(majorKey, relativeMinor, keyType, rank, chromaticScale) {
         super(majorKey);
         this.majorKey = majorKey;
@@ -55,8 +58,9 @@ export class KeySignature extends EnumValue {
         this.chromaticScale = chromaticScale;
     }
 }
+exports.KeySignature = KeySignature;
 /** Enum for each key signature. */
-class KeySignatureEnum extends Enum {
+class KeySignatureEnum extends ts_enums_1.Enum {
     constructor() {
         super();
         this.C = new KeySignature('C', 'Am', KeyType.SHARP, 0, SHARP_SCALE);
@@ -65,16 +69,16 @@ class KeySignatureEnum extends Enum {
         this.Eb = new KeySignature('Eb', 'Cm', KeyType.FLAT, 3, FLAT_SCALE);
         this.E = new KeySignature('E', 'C#m', KeyType.SHARP, 4, SHARP_SCALE);
         this.F = new KeySignature('F', 'Dm', KeyType.FLAT, 5, FLAT_SCALE);
-        this.Gb = new KeySignature('Gb', 'Ebm', KeyType.FLAT, 6, G_FLAT_SCALE);
-        this.Fsharp = new KeySignature('F#', 'D#m', KeyType.SHARP, 6, F_SHARP_SCALE);
+        this.Gb = new KeySignature('Gb', 'Ebm', KeyType.FLAT, 6, exports.G_FLAT_SCALE);
+        this.Fsharp = new KeySignature('F#', 'D#m', KeyType.SHARP, 6, exports.F_SHARP_SCALE);
         this.G = new KeySignature('G', 'Em', KeyType.SHARP, 7, SHARP_SCALE);
         this.Ab = new KeySignature('Ab', 'Fm', KeyType.FLAT, 8, FLAT_SCALE);
         this.A = new KeySignature('A', 'F#m', KeyType.SHARP, 9, SHARP_SCALE);
         this.Bb = new KeySignature('Bb', 'Gm', KeyType.FLAT, 10, FLAT_SCALE);
         this.B = new KeySignature('B', 'G#m', KeyType.SHARP, 11, SHARP_SCALE);
         // Unconventional key signatures:
-        this.Csharp = new KeySignature('C#', 'A#m', KeyType.SHARP, 1, C_SHARP_SCALE);
-        this.Cb = new KeySignature('Cb', 'Abm', KeyType.FLAT, 11, C_FLAT_SCALE);
+        this.Csharp = new KeySignature('C#', 'A#m', KeyType.SHARP, 1, exports.C_SHARP_SCALE);
+        this.Cb = new KeySignature('Cb', 'Abm', KeyType.FLAT, 11, exports.C_FLAT_SCALE);
         this.Dsharp = new KeySignature('D#', '', KeyType.SHARP, 3, SHARP_SCALE);
         this.Gsharp = new KeySignature('G#', '', KeyType.SHARP, 8, SHARP_SCALE);
         this.keySignatureMap = new Map();
@@ -94,7 +98,7 @@ class KeySignatureEnum extends Enum {
      */
     valueOf(name) {
         if (KEY_SIGNATURE_REGEX.test(name)) {
-            const chord = Chord.parse(name);
+            const chord = Chord_1.Chord.parse(name);
             const signatureName = chord.isMinor() ? chord.root + 'm' : chord.root;
             const foundSignature = this.keySignatureMap.get(signatureName);
             if (foundSignature) {
@@ -120,11 +124,12 @@ class KeySignatureEnum extends Enum {
 /**
  * Transforms the given chord into a key signature.
  */
-export function guessKeySignature(chord) {
+function guessKeySignature(chord) {
     let signature = chord.root;
     if (chord.isMinor()) {
         signature += 'm';
     }
-    return KeySignatures.valueOf(signature);
+    return exports.KeySignatures.valueOf(signature);
 }
-export const KeySignatures = new KeySignatureEnum();
+exports.guessKeySignature = guessKeySignature;
+exports.KeySignatures = new KeySignatureEnum();

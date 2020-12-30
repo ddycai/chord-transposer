@@ -1,5 +1,8 @@
-import { KeySignatures, KeySignature, guessKeySignature, } from "./KeySignatures";
-import { Chord, isChord, CHORD_RANKS } from "./Chord";
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.transpose = exports.Transposer = void 0;
+const KeySignatures_1 = require("./KeySignatures");
+const Chord_1 = require("./Chord");
 const N_KEYS = 12;
 /** Fluent API for transposing text containing chords. */
 class Transposer {
@@ -24,8 +27,8 @@ class Transposer {
         }
         for (const line of this.tokens) {
             for (const token of line) {
-                if (token instanceof Chord) {
-                    return guessKeySignature(token);
+                if (token instanceof Chord_1.Chord) {
+                    return KeySignatures_1.guessKeySignature(token);
                 }
             }
         }
@@ -33,7 +36,7 @@ class Transposer {
     }
     fromKey(key) {
         this.currentKey =
-            key instanceof KeySignature ? key : KeySignatures.valueOf(key);
+            key instanceof KeySignatures_1.KeySignature ? key : KeySignatures_1.KeySignatures.valueOf(key);
         return this;
     }
     up(semitones) {
@@ -47,24 +50,25 @@ class Transposer {
     }
     toKey(toKey) {
         const key = this.getKey();
-        const newKey = KeySignatures.valueOf(toKey);
+        const newKey = KeySignatures_1.KeySignatures.valueOf(toKey);
         const tokens = transposeTokens(this.tokens, key, newKey);
         return new Transposer(tokens).fromKey(newKey);
     }
     /** Returns a string representation of the text. */
     toString() {
         return this.tokens
-            .map((line) => line.map((token) => token.toString()).join(""))
+            .map((line) => line.map((token) => token.toString()).join())
             .join("\n");
     }
 }
+exports.Transposer = Transposer;
 /**
  * Finds the key that is a specified number of semitones above/below the current
  * key.
  */
 function transposeKey(currentKey, semitones) {
     const newRank = (currentKey.rank + semitones + N_KEYS) % N_KEYS;
-    return KeySignatures.forRank(newRank);
+    return KeySignatures_1.KeySignatures.forRank(newRank);
 }
 /** Tokenize the given text into chords.
  *
@@ -86,8 +90,8 @@ function tokenize(text, threshold) {
         let lastTokenWasString = false;
         for (const token of tokens) {
             const isTokenEmpty = token.trim() === "";
-            if (!isTokenEmpty && isChord(token)) {
-                const chord = Chord.parse(token);
+            if (!isTokenEmpty && Chord_1.isChord(token)) {
+                const chord = Chord_1.Chord.parse(token);
                 newLine.push(chord);
                 chordCount++;
                 lastTokenWasString = false;
@@ -141,7 +145,7 @@ function transposeTokens(tokens, fromKey, toKey) {
                 }
             }
             else {
-                const transposedChord = new Chord(transpositionMap.get(token.root), token.suffix, transpositionMap.get(token.bass));
+                const transposedChord = new Chord_1.Chord(transpositionMap.get(token.root), token.suffix, transpositionMap.get(token.bass));
                 const originalChordLen = token.toString().length;
                 const transposedChordLen = transposedChord.toString().length;
                 // Handle length differences between chord and transposed chord.
@@ -174,7 +178,7 @@ function createTranspositionMap(currentKey, newKey) {
     const map = new Map();
     const semitones = semitonesBetween(currentKey, newKey);
     const scale = newKey.chromaticScale;
-    for (const [chord, rank] of CHORD_RANKS.entries()) {
+    for (const [chord, rank] of Chord_1.CHORD_RANKS.entries()) {
         const newRank = (rank + semitones + N_KEYS) % N_KEYS;
         map.set(chord, scale[newRank]);
     }
@@ -184,5 +188,16 @@ function createTranspositionMap(currentKey, newKey) {
 function semitonesBetween(a, b) {
     return b.rank - a.rank;
 }
-export const transpose = (text) => new Transposer(text);
-export default Transposer;
+exports.transpose = (text) => new Transposer(text);
+var Chord_2 = require("./Chord");
+Object.defineProperty(exports, "Chord", { enumerable: true, get: function () { return Chord_2.Chord; } });
+var KeySignatures_2 = require("./KeySignatures");
+Object.defineProperty(exports, "KeySignature", { enumerable: true, get: function () { return KeySignatures_2.KeySignature; } });
+Object.defineProperty(exports, "KeySignatures", { enumerable: true, get: function () { return KeySignatures_2.KeySignatures; } });
+exports.default = {
+    transpose: exports.transpose,
+    Chord: Chord_1.Chord,
+    KeySignature: KeySignatures_1.KeySignature,
+    KeySignatures: KeySignatures_1.KeySignatures,
+    Transposer,
+};
