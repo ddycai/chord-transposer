@@ -71,15 +71,8 @@ function transposeKey(currentKey, semitones) {
     return KeySignatures_1.KeySignatures.forRank(newRank);
 }
 /** Tokenize the given text into chords.
- *
- *  The ratio of chords to non-chord tokens in each line must be greater than
- *  the given threshold in order for the line to be transposed. The threshold
- *  is set to 0.5 by default.
  */
-function tokenize(text, threshold) {
-    if (threshold === undefined) {
-        threshold = 0.5;
-    }
+function tokenize(text) {
     const lines = text.split("\n");
     const newText = [];
     for (const line of lines) {
