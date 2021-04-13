@@ -106,8 +106,7 @@ function tokenize(text: string, threshold?: number): Token[][] {
     const newLine: Token[] = [];
     let chordCount: number = 0;
     let tokenCount: number = 0;
-    const tokens: string[] = line.split(/(\s+|-)/g);
-
+    const tokens: string[] = line.split(/(\s+|-|]|\[)/g);
     let lastTokenWasString: boolean = false;
     for (const token of tokens) {
       const isTokenEmpty = token.trim() === "";
@@ -129,11 +128,7 @@ function tokenize(text: string, threshold?: number): Token[][] {
         lastTokenWasString = true;
       }
     }
-    if (chordCount / tokenCount >= threshold) {
-      newText.push(newLine);
-    } else {
-      newText.push([line]);
-    }
+    newText.push(newLine);
   }
   return newText;
 }
