@@ -240,6 +240,13 @@ describe("Transposer", () => {
     );
   });
 
+  it("transposes chords inlined in square brackets (ChordPro)", () => {
+    expect(transpose("[C]Hello [D] world! [C]").toKey("F").toString()).toEqual(
+        "[F]Hello [G] world! [F]"
+    );
+
+  });
+
   it("preserves whitespace", () => {
     expect(transpose("C    D  C\nHello world!").toKey("F").toString()).toEqual(
       "F    G  F\nHello world!"

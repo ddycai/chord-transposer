@@ -89,15 +89,8 @@ function transposeKey(
 }
 
 /** Tokenize the given text into chords.
- *
- *  The ratio of chords to non-chord tokens in each line must be greater than
- *  the given threshold in order for the line to be transposed. The threshold
- *  is set to 0.5 by default.
  */
-function tokenize(text: string, threshold?: number): Token[][] {
-  if (threshold === undefined) {
-    threshold = 0.5;
-  }
+function tokenize(text: string): Token[][] {
   const lines: string[] = text.split("\n");
 
   const newText: Token[][] = [];
@@ -106,8 +99,7 @@ function tokenize(text: string, threshold?: number): Token[][] {
     const newLine: Token[] = [];
     let chordCount: number = 0;
     let tokenCount: number = 0;
-    const tokens: string[] = line.split(/(\s+|-)/g);
-
+    const tokens: string[] = line.split(/(\s+|-|]|\[)/g);
     let lastTokenWasString: boolean = false;
     for (const token of tokens) {
       const isTokenEmpty = token.trim() === "";
@@ -129,11 +121,7 @@ function tokenize(text: string, threshold?: number): Token[][] {
         lastTokenWasString = true;
       }
     }
-    if (chordCount / tokenCount >= threshold) {
-      newText.push(newLine);
-    } else {
-      newText.push([line]);
-    }
+    newText.push(newLine);
   }
   return newText;
 }
