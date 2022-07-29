@@ -61,7 +61,7 @@ export class KeySignature extends EnumValue {
 }
 
 /** Enum for each key signature. */
-class KeySignatureEnum extends Enum<KeySignature> {
+export class KeySignatureEnum extends Enum<KeySignature> {
   C: KeySignature =
     new KeySignature('C', 'Am', KeyType.SHARP, 0, SHARP_SCALE);
 
