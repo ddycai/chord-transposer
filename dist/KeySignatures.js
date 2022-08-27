@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.KeySignatures = exports.guessKeySignature = exports.KeySignature = exports.KeyType = exports.C_FLAT_SCALE = exports.G_FLAT_SCALE = exports.C_SHARP_SCALE = exports.F_SHARP_SCALE = void 0;
+exports.KeySignatures = exports.guessKeySignature = exports.KeySignatureEnum = exports.KeySignature = exports.KeyType = exports.C_FLAT_SCALE = exports.G_FLAT_SCALE = exports.C_SHARP_SCALE = exports.F_SHARP_SCALE = void 0;
 const ts_enums_1 = require("ts-enums");
 const Chord_1 = require("./Chord");
 const XRegExp = require("xregexp");
@@ -121,6 +121,7 @@ class KeySignatureEnum extends ts_enums_1.Enum {
         throw new Error(`${rank} is not a valid rank.`);
     }
 }
+exports.KeySignatureEnum = KeySignatureEnum;
 /**
  * Transforms the given chord into a key signature.
  */
