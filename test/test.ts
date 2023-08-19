@@ -279,8 +279,8 @@ describe("Transposer", () => {
 
   it("transposes chords with complex added tones", () => {
     expect(
-      transpose("Cadd9 C7/9 Cm7/5- C7/9/11+ C7+/9 C7.11+").toKey("F").toString()
-    ).toEqual("Fadd9 F7/9 Fm7/5- F7/9/11+ F7+/9 F7.11+");
+      transpose("Cadd9 C7/9 Cm7/5- C7/9/11+ C7+/9 C7.11+ E7#9").toKey("F").toString()
+    ).toEqual("Fadd9 F7/9 Fm7/5- F7/9/11+ F7+/9 F7.11+ A7#9");
   });
 
   it("transposes bass chords to the right key", () => {
