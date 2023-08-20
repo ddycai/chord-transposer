@@ -24,7 +24,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ddycai/chord-transposer-lib.git"
+    "url": "git+https://github.com/ddycai/chord-transposer.git"
   },
   "keywords": [
     "transpose",
@@ -38,9 +38,9 @@
   "author": "Duncan Cai",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/ddycai/chord-transposer-lib/issues"
+    "url": "https://github.com/ddycai/chord-transposer/issues"
   },
-  "homepage": "https://github.com/ddycai/chord-transposer-lib#readme",
+  "homepage": "https://github.com/ddycai/chord-transposer#readme",
   "exports": {
     "require": "./dist/index.js",
     "import": "./dist/esm/wrapper.js",
