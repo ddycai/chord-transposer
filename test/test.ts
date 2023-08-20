@@ -242,9 +242,8 @@ describe("Transposer", () => {
 
   it("transposes chords inlined in square brackets (ChordPro)", () => {
     expect(transpose("[C]Hello [D] world! [C]").toKey("F").toString()).toEqual(
-        "[F]Hello [G] world! [F]"
+      "[F]Hello [G] world! [F]"
     );
-
   });
 
   it("preserves whitespace", () => {
@@ -267,20 +266,47 @@ describe("Transposer", () => {
     expect(transpose("C Am  Em").toKey("Db").toString()).toEqual("Db Bbm Fm");
   });
 
-  it("transposes various types of chords", () => {
-    expect(transpose("C Cmaj CM").toKey("F").toString()).toEqual("F Fmaj FM");
-    expect(transpose("Cm Cmin C-").toKey("F").toString()).toEqual("Dm Dmin D-");
-    expect(transpose("Cdim").toKey("F").toString()).toEqual("Fdim");
+  it("tranposes major and minor chords", () => {
+    expect(transpose("C Cmaj Cmaj7 CM").toKey("F").toString()).toEqual(
+      "F Fmaj Fmaj7 FM"
+    );
+    expect(transpose("Cm Cmin Cmin7").toKey("F").toString()).toEqual(
+      "Dm Dmin Dmin7"
+    );
+  });
+
+  it("tranposes augmented and diminished chords", () => {
     expect(transpose("Caug C+ C+5").toKey("F").toString()).toEqual(
       "Faug F+ F+5"
     );
-    expect(transpose("Asus4 Asus6").up(2).toString()).toEqual("Bsus4 Bsus6");
+    expect(transpose("Cdim C-").toKey("F").toString()).toEqual("Fdim F-");
   });
 
-  it("transposes chords with complex added tones", () => {
+  it("tranposes sus chords", () => {
+    expect(transpose("Asus4 Asus2").up(2).toString()).toEqual("Bsus4 Bsus2");
+  });
+
+  it("transposes chords with added tones", () => {
+    expect(transpose("Cadd9 C9 C6 C+9 Cadd13 C+13").toKey("F").toString()).toEqual(
+      "Fadd9 F9 F6 F+9 Fadd13 F+13"
+    );
     expect(
-      transpose("Cadd9 C7/9 Cm7/5- C7/9/11+ C7+/9 C7.11+ E7#9").toKey("F").toString()
-    ).toEqual("Fadd9 F7/9 Fm7/5- F7/9/11+ F7+/9 F7.11+ A7#9");
+      transpose("C7/9 Cm7/5- C7/9/11+ C7+/9 C7.11+").toKey("F").toString()
+    ).toEqual("F7/9 Fm7/5- F7/9/11+ F7+/9 F7.11+");
+  });
+
+  it("transposes chords with flat and sharp added tones", () => {
+    expect(
+      transpose("C7b9 C7b13 C7(b9) E7#9 E7#11").toKey("F").toString()
+    ).toEqual("F7b9 F7b13 F7(b9) A7#9 A7#11");
+  });
+
+  it("transposes chords with added tones in parentheses", () => {
+    expect(
+      transpose("C7(b9) C7(add13) C7(b5) C7(#9) C7b9(#11)")
+        .toKey("Db")
+        .toString()
+    ).toEqual("Db7(b9) Db7(add13) Db7(b5) Db7(#9) Db7b9(#11)");
   });
 
   it("transposes bass chords to the right key", () => {

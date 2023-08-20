@@ -77,8 +77,6 @@ function tokenize(text) {
     const newText = [];
     for (const line of lines) {
         const newLine = [];
-        let chordCount = 0;
-        let tokenCount = 0;
         const tokens = line.split(/(\s+|-|]|\[)/g);
         let lastTokenWasString = false;
         for (const token of tokens) {
@@ -86,7 +84,6 @@ function tokenize(text) {
             if (!isTokenEmpty && Chord_1.isChord(token)) {
                 const chord = Chord_1.Chord.parse(token);
                 newLine.push(chord);
-                chordCount++;
                 lastTokenWasString = false;
             }
             else {
@@ -95,9 +92,6 @@ function tokenize(text) {
                 }
                 else {
                     newLine.push(token);
-                }
-                if (!isTokenEmpty) {
-                    tokenCount++;
                 }
                 lastTokenWasString = true;
             }
