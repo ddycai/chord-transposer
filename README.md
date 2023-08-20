@@ -1,8 +1,7 @@
 Chord Transposer
 ========
 
-Javascript/TypeScript library for transposing musical chords within arbitrary
-text.
+Typescript library for transposing musical chords within text.
 
 ## Usage
 

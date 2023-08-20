@@ -1,5 +1,5 @@
 {
-  "name": "chord-transposer",
+  "name": "chord-transposer-lib",
   "version": "3.0.4",
   "description": "Transposes musical chords in arbitrary text.",
   "main": "dist/index.js",
@@ -24,7 +24,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ddycai/chord-transposer.git"
+    "url": "git+https://github.com/ddycai/chord-transposer-lib.git"
   },
   "keywords": [
     "transpose",
@@ -38,9 +38,9 @@
   "author": "Duncan Cai",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/ddycai/chord-transposer/issues"
+    "url": "https://github.com/ddycai/chord-transposer-lib/issues"
   },
-  "homepage": "https://github.com/ddycai/chord-transposer#readme",
+  "homepage": "https://github.com/ddycai/chord-transposer-lib#readme",
   "exports": {
     "require": "./dist/index.js",
     "import": "./dist/esm/wrapper.js",
