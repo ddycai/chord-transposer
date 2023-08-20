@@ -1,5 +1,5 @@
 {
-  "name": "chord-transposer-lib",
+  "name": "chord-transposer",
   "version": "3.0.7",
   "description": "Transposes musical chords in arbitrary text.",
   "main": "dist/index.js",
