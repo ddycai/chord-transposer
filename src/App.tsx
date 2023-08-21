@@ -101,12 +101,14 @@ function App() {
               <option value="" selected={true}>
                 select key...
               </option>
-              {KeySignatures.values.map((keySig) => (
-                <option value={keySig.majorKey}>
-                  {keySig.majorKey}
-                  {keySig.relativeMinor ? " / " + keySig.relativeMinor : ""}
-                </option>
-              ))}
+              {KeySignatures.values
+                .filter((keySig) => !!keySig.relativeMinor)
+                .map((keySig) => (
+                  <option value={keySig.majorKey}>
+                    {keySig.majorKey}
+                    {keySig.relativeMinor ? " / " + keySig.relativeMinor : ""}
+                  </option>
+                ))}
             </select>
             <button
               type="button"
