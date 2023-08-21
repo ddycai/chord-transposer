@@ -1,0 +1,18 @@
+.chord-input {
+  min-height: 300px;
+  font-family:'Courier New', Courier, monospace;
+}
+
+option[value=""] {
+  color: #888;
+}
+
+textarea {
+  min-height: 100px;
+  padding: 8px;
+  font-size: 18px;
+  resize: none;
+  border: solid 1px;
+  border-radius: 4px;
+  outline: none;
+}

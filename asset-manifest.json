@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/chord-transposer/static/css/main.148d391c.css",
+    "main.js": "/chord-transposer/static/js/main.31452d86.js",
+    "static/js/787.e41af0fc.chunk.js": "/chord-transposer/static/js/787.e41af0fc.chunk.js",
+    "index.html": "/chord-transposer/index.html",
+    "main.148d391c.css.map": "/chord-transposer/static/css/main.148d391c.css.map",
+    "main.31452d86.js.map": "/chord-transposer/static/js/main.31452d86.js.map",
+    "787.e41af0fc.chunk.js.map": "/chord-transposer/static/js/787.e41af0fc.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.148d391c.css",
+    "static/js/main.31452d86.js"
+  ]
+}
