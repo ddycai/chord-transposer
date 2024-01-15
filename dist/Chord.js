@@ -1,7 +1,10 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.isChord = exports.Chord = exports.MINOR_PATTERN = exports.ROOT_PATTERN = exports.CHORD_RANKS = void 0;
-const XRegExp = require("xregexp");
+const xregexp_1 = __importDefault(require("xregexp"));
 /**
  * The rank for each possible chord. Rank is the distance in semitones from C.
  */
@@ -35,8 +38,8 @@ const SUFFIX_PATTERN = `(?<suffix>\\(?${TRIAD_PATTERN}?${ADDED_TONE_PATTERN}*\\)
 const BASS_PATTERN = "(\\/(?<bass>[A-G](#|b)?))?";
 exports.ROOT_PATTERN = "(?<root>[A-G](#|b)?)";
 exports.MINOR_PATTERN = "(m|min|minor)+";
-const CHORD_REGEX = XRegExp(`^${exports.ROOT_PATTERN}${SUFFIX_PATTERN}${BASS_PATTERN}$`);
-const MINOR_SUFFIX_REGEX = XRegExp(`^${exports.MINOR_PATTERN}.*$`);
+const CHORD_REGEX = xregexp_1.default(`^${exports.ROOT_PATTERN}${SUFFIX_PATTERN}${BASS_PATTERN}$`);
+const MINOR_SUFFIX_REGEX = xregexp_1.default(`^${exports.MINOR_PATTERN}.*$`);
 /**
  * Represents a musical chord. For example, Am7/C would have:
  *
@@ -65,7 +68,7 @@ class Chord {
         if (!isChord(token)) {
             throw new Error(`${token} is not a valid chord`);
         }
-        const result = XRegExp.exec(token, CHORD_REGEX);
+        const result = xregexp_1.default.exec(token, CHORD_REGEX);
         return new Chord(result.root, result.suffix, result.bass);
     }
 }
