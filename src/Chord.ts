@@ -30,7 +30,7 @@ export const CHORD_RANKS: Map<string, number> = new Map([
 // Regex for recognizing chords
 const TRIAD_PATTERN = "(M|maj|major|m|min|minor|dim|sus|dom|aug|\\+|-)";
 const ADDED_TONE_PATTERN = "(\\(?([/\\.\\+]|add)?[#b]?\\d+[\\+-]?\\)?)";
-const SUFFIX_PATTERN = `(?<suffix>\\(?${TRIAD_PATTERN}?${ADDED_TONE_PATTERN}*\\)?)`;
+const SUFFIX_PATTERN = `(?<suffix>\\(?${TRIAD_PATTERN}${ADDED_TONE_PATTERN}*\\)?)`;
 const BASS_PATTERN = "(\\/(?<bass>[A-G](#|b)?))?";
 
 export const ROOT_PATTERN = "(?<root>[A-G](#|b)?)";
