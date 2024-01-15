@@ -114,7 +114,6 @@ class KeySignatureEnum extends ts_enums_1.Enum {
                 }
             }
         }
-        console.log({ name, regex: KEY_SIGNATURE_REGEX.test(name) });
         throw new Error(`${name} is not a valid key signature.`);
     }
     forRank(rank) {
